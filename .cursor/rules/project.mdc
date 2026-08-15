@@ -1,0 +1,204 @@
+---
+description: Core development rules for the interactive portfolio experience
+alwaysApply: true
+---
+
+# Project Overview
+
+This project is a cinematic interactive personal portfolio built with React and TypeScript.
+
+The intended experience is:
+
+1. Hand-drawn notebook/sketchbook introduction.
+2. Transition from the notebook into a 3D space environment.
+3. A beautiful 3D Earth with stars, atmosphere, clouds, lighting, and night-side city lights.
+4. A cinematic camera dive toward Earth through the atmosphere and clouds.
+5. A lightweight airplane flies past during the descent.
+6. A bright white flash transitions into a 3D book.
+7. The book opens and the camera zooms into its pages.
+8. The pages transition back into a hand-drawn notebook-style portfolio.
+9. The notebook contains the developer's profile, projects, experience, education, skills, resume, and contact information.
+
+This concept is intentional. Do not replace it with a conventional portfolio, city exploration experience, dashboard, or unrelated design.
+
+# Technology
+
+Use the existing stack unless there is a strong technical reason to change it:
+
+- React
+- TypeScript
+- Vite
+- Three.js
+- React Three Fiber
+- Drei
+- GSAP
+- Leva for development/debug controls when useful
+
+Do not introduce additional libraries without first explaining why they are necessary.
+
+Do not add a backend, database, authentication system, or server unless explicitly requested.
+
+Do not introduce Blender as a project requirement.
+
+# Coding Philosophy
+
+Prioritize:
+
+1. Readability
+2. Simplicity
+3. Maintainability
+4. Correctness
+5. Performance
+6. Visual quality
+
+Prefer straightforward code over clever abstractions.
+
+Do not create unnecessarily generic frameworks or abstractions.
+
+Do not over-engineer simple functionality.
+
+Keep components focused and reasonably small.
+
+If a component becomes large or has multiple unrelated responsibilities, suggest splitting it.
+
+Avoid giant files.
+
+# TypeScript
+
+Use TypeScript properly and consistently.
+
+Prefer explicit, readable types where they improve understanding.
+
+Avoid `any` unless there is a legitimate unavoidable reason.
+
+Do not disable TypeScript strictness to make code compile.
+
+Prefer modern TypeScript patterns that work with the project's current Vite configuration.
+
+When using unfamiliar TypeScript syntax or advanced types, keep the implementation simple and explain why the syntax is needed.
+
+# React
+
+Use functional React components.
+
+Use React hooks appropriately.
+
+Keep component responsibilities clear.
+
+Avoid unnecessary state.
+
+Avoid unnecessary prop drilling when a simpler design is sufficient.
+
+Do not introduce a state management library unless the existing architecture genuinely requires one.
+
+# Three.js / React Three Fiber
+
+Keep 3D code understandable.
+
+Prefer React Three Fiber components over unnecessary imperative Three.js code.
+
+Separate major 3D responsibilities into focused components.
+
+Do not put the entire 3D experience into one component.
+
+Prefer procedural/simple geometry and lightweight assets when they can achieve the same visual result.
+
+Avoid unnecessarily expensive models, textures, particle counts, or post-processing effects.
+
+Performance matters because the final site should work on normal desktop hardware and reasonably capable mobile devices.
+
+# Animation
+
+Use GSAP for complex cinematic sequences when appropriate.
+
+Keep animation timelines understandable.
+
+Separate major animation sequences from unrelated rendering logic.
+
+Avoid deeply nested animation callbacks when a timeline can express the sequence more clearly.
+
+Animation code should be easy for another developer to inspect and modify.
+
+# Comments
+
+Comments should explain WHY something is done when the reason is not obvious.
+
+Do not add comments that merely restate the code.
+
+Prefer clear naming over excessive comments.
+
+For technically important code such as shaders, camera transitions, procedural effects, or unusual TypeScript, add concise explanatory comments.
+
+# Assets
+
+Prefer lightweight assets.
+
+Do not download or introduce assets without checking that they are appropriate for a public portfolio project.
+
+Prefer assets with clear, permissive licensing.
+
+When an external asset is introduced, record its source and license in the project documentation.
+
+Do not create a dependency on Blender.
+
+# Architecture
+
+Preserve the existing experience-stage architecture unless there is a strong reason to improve it.
+
+The intended high-level flow is:
+
+INTRO
+→ SPACE
+→ EARTH_DIVE
+→ BOOK
+→ NOTEBOOK
+
+Keep the cinematic 3D experience separate from the DOM-based notebook portfolio where practical.
+
+The final portfolio content should remain normal React/HTML/CSS so it is responsive, maintainable, accessible, and easy to update.
+
+# Development Workflow
+
+Before implementing a significant feature:
+
+1. Inspect the existing code.
+2. Explain the proposed approach briefly.
+3. Identify the files that need to change.
+4. Implement only the requested feature.
+5. Run TypeScript/build/lint checks when appropriate.
+6. Summarize what changed and explain any important code or concepts.
+
+Do not modify unrelated files.
+
+Do not rewrite working architecture without a reason.
+
+Do not install dependencies without explaining the purpose.
+
+# Learning Mode
+
+The developer is actively learning TypeScript, React Three Fiber, Three.js, shaders, and modern frontend architecture.
+
+When introducing an unfamiliar concept:
+
+- Keep the implementation practical.
+- Explain the concept briefly after implementation.
+- Prefer simple examples connected to the current project.
+- Do not hide important logic behind unnecessary abstractions.
+
+The goal is not only to produce the website but also to leave the developer able to understand and maintain the code.
+
+# Development Controls
+
+Temporary development controls are allowed while building the experience.
+
+For example, buttons that jump directly between experience stages are useful for developing and testing individual scenes.
+
+Clearly mark temporary development tooling and remove or disable it before production.
+
+# Important Constraint
+
+Do not attempt to build the entire website in one operation.
+
+Implement the project incrementally, one scene or feature at a time.
+
+Before large changes, inspect the current architecture and work with it rather than replacing it.
