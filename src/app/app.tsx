@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ExperienceStage } from './experience';
 import ExperienceController from '../components/ExperienceController';
+import './app.css';
 
 function App() {
   const [currentStage, setCurrentStage] = useState<ExperienceStage>(
