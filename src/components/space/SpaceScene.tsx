@@ -1,17 +1,16 @@
-import { useRef } from 'react';
+import { Suspense, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import type { Group } from 'three';
-
-/** Temporary centered marker — replaced by Earth in the next major phase. */
-function PlaceholderBody() {
-  return (
-    <mesh>
-      <sphereGeometry args={[0.55, 32, 32]} />
-      <meshStandardMaterial color="#2a3548" roughness={0.9} metalness={0.05} />
-    </mesh>
-  );
-}
+import Earth from './Earth';
+import CloudLayer from './CloudLayer';
+import Atmosphere from './Atmosphere';
+import MilkyWay from './MilkyWay';
+import {
+  EARTH_AXIAL_TILT_X,
+  EARTH_AXIAL_TILT_Z,
+  SUN_POSITION,
+} from './earthConfig';
 
 /**
  * Same-sign drift on every layer (positive Y only) so it feels like travel, not spin.
@@ -35,7 +34,7 @@ function Starfield() {
           radius={0}
           depth={100}
           count={3800}
-          factor={2.2}
+          factor={2.6}
           saturation={0}
           fade
           speed={0.25}
@@ -47,7 +46,7 @@ function Starfield() {
           radius={0}
           depth={70}
           count={900}
-          factor={4}
+          factor={4.4}
           saturation={0}
           fade
           speed={0.4}
@@ -59,7 +58,7 @@ function Starfield() {
           radius={0}
           depth={45}
           count={220}
-          factor={6}
+          factor={6.5}
           saturation={0}
           fade
           speed={0.55}
@@ -72,11 +71,25 @@ function Starfield() {
 function SpaceScene() {
   return (
     <>
-      <ambientLight intensity={0.18} />
-      <directionalLight position={[4, 3, 5]} intensity={1} />
+      <ambientLight intensity={0.035} />
+      <directionalLight
+        position={SUN_POSITION.toArray()}
+        intensity={2.4}
+        color="#fff2dd"
+      />
 
       <Starfield />
-      <PlaceholderBody />
+
+      <Suspense fallback={null}>
+        <MilkyWay />
+
+        {/* Static axial tilt — Earth/clouds keep their own local Y spin inside */}
+        <group rotation={[EARTH_AXIAL_TILT_X, 0, EARTH_AXIAL_TILT_Z]}>
+          <Earth />
+          <CloudLayer />
+          <Atmosphere />
+        </group>
+      </Suspense>
     </>
   );
 }
