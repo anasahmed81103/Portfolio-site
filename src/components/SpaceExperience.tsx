@@ -5,8 +5,8 @@ function SpaceExperience() {
   return (
     <div className="space-experience">
       <Canvas
-        // Centered framing: future Earth sits as the hero in the middle of the frame
-        camera={{ position: [0, 0, 6], fov: 38, near: 0.1, far: 400 }}
+        // Establishing shot: farther back so Earth fills ~40% of viewport height
+        camera={{ position: [0, 0, 12.5], fov: 38, near: 0.1, far: 400 }}
       >
         <color attach="background" args={['#000000']} />
         <SpaceScene />

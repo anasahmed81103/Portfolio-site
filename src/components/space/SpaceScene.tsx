@@ -6,6 +6,7 @@ import Earth from './Earth';
 import CloudLayer from './CloudLayer';
 import Atmosphere from './Atmosphere';
 import MilkyWay from './MilkyWay';
+import TwinklingStars from './TwinklingStars';
 import {
   EARTH_AXIAL_TILT_X,
   EARTH_AXIAL_TILT_Z,
@@ -13,8 +14,8 @@ import {
 } from './earthConfig';
 
 /**
- * Same-sign drift on every layer (positive Y only) so it feels like travel, not spin.
- * Far is slowest; near is slightly faster — never opposite directions.
+ * Barely perceptible same-sign drift (positive Y only).
+ * Twinkle is stronger on the tiny far stars so the sky feels alive without blinking beacons.
  */
 function Starfield() {
   const farRef = useRef<Group>(null);
@@ -22,46 +23,48 @@ function Starfield() {
   const nearRef = useRef<Group>(null);
 
   useFrame((_, delta) => {
-    if (farRef.current) farRef.current.rotation.y += delta * 0.0015;
-    if (midRef.current) midRef.current.rotation.y += delta * 0.0025;
-    if (nearRef.current) nearRef.current.rotation.y += delta * 0.004;
+    if (farRef.current) farRef.current.rotation.y += delta * 0.0003;
+    if (midRef.current) midRef.current.rotation.y += delta * 0.0005;
+    if (nearRef.current) nearRef.current.rotation.y += delta * 0.0008;
   });
 
   return (
     <>
+      {/* Dense tiny field — blends into the Milky Way; most of the shimmer lives here */}
       <group ref={farRef}>
         <Stars
           radius={0}
-          depth={100}
-          count={3800}
-          factor={2.6}
+          depth={110}
+          count={5200}
+          factor={2.2}
           saturation={0}
           fade
-          speed={0.25}
+          speed={0.55}
         />
       </group>
 
       <group ref={midRef}>
         <Stars
           radius={0}
-          depth={70}
-          count={900}
-          factor={4.4}
+          depth={75}
+          count={1200}
+          factor={3.8}
           saturation={0}
           fade
-          speed={0.4}
+          speed={0.42}
         />
       </group>
 
+      {/* Sparse brighter accents — still softer than the tiny field */}
       <group ref={nearRef}>
         <Stars
           radius={0}
           depth={45}
           count={220}
-          factor={6.5}
+          factor={6.2}
           saturation={0}
           fade
-          speed={0.55}
+          speed={0.3}
         />
       </group>
     </>
@@ -79,6 +82,7 @@ function SpaceScene() {
       />
 
       <Starfield />
+      <TwinklingStars />
 
       <Suspense fallback={null}>
         <MilkyWay />
