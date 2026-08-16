@@ -3,6 +3,10 @@ import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import type { Mesh, Texture } from 'three';
 import { EARTH_RADIUS } from './earthConfig';
+import {
+  useScrollAcceleration,
+} from '../../hooks/useScrollAcceleration.ts';
+import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
 
 /** Slightly above the surface so clouds sit in a thin shell, not a second planet. */
 const CLOUD_RADIUS = EARTH_RADIUS * 1.012;
@@ -33,6 +37,7 @@ void main() {
 
 function CloudLayer() {
   const cloudRef = useRef<Mesh>(null);
+  const { intensity } = useScrollAcceleration();
   const cloudMap = useTexture('/textures/earth/earth-clouds.jpg') as Texture;
 
   const uniforms = useMemo(
@@ -44,8 +49,10 @@ function CloudLayer() {
 
   useFrame((_, delta) => {
     if (!cloudRef.current) return;
-    // Same sign as Earth (positive Y), slightly faster so clouds drift ahead
-    cloudRef.current.rotation.y += delta * 0.018;
+    // Slightly higher max than Earth so relative cloud drift stays natural
+    const speed =
+      0.018 * accelerationMultiplier(intensity.current, 11);
+    cloudRef.current.rotation.y += delta * speed;
   });
 
   return (

@@ -3,6 +3,10 @@ import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import { SRGBColorSpace, type Group, type Texture } from 'three';
 import { EARTH_RADIUS, SUN_POSITION } from './earthConfig';
+import {
+  useScrollAcceleration,
+} from '../../hooks/useScrollAcceleration.ts';
+import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
 
 const EARTH_TEXTURE_URLS = [
   '/textures/earth/earth-day.jpg',
@@ -55,6 +59,7 @@ void main() {
 
 function Earth() {
   const earthRef = useRef<Group>(null);
+  const { intensity } = useScrollAcceleration();
 
   const [dayMap, nightMap] = useTexture(
     [...EARTH_TEXTURE_URLS],
@@ -72,7 +77,10 @@ function Earth() {
 
   useFrame((_, delta) => {
     if (!earthRef.current) return;
-    earthRef.current.rotation.y += delta * 0.012;
+    // Up to ~10× when scroll intensity is max — same +Y axis, never reversed
+    const speed =
+      0.012 * accelerationMultiplier(intensity.current, 10);
+    earthRef.current.rotation.y += delta * speed;
   });
 
   return (
