@@ -11,18 +11,30 @@ import {
   diveProgressRef,
   diveTargetRef,
 } from '../hooks/useDiveProgress';
+import {
+  APPROACH_END,
+  earthRotationProgressRef,
+  earthSpinAccumRef,
+  earthSpinGateOpenRef,
+} from './earth-dive/earthDivePhases';
+import { planetYawDriveRef } from '../hooks/planetYawDrive';
 
-/** Lower = more scroll needed for the full dive (slower, more cinematic). */
+/** Approach + dive scrub sensitivity (spin phase does NOT use this). */
 const DIVE_WHEEL_SCALE = 0.00055;
 
-/** Smooth handoff weight: 1 = full Space acceleration, 0 = dive-only. */
+/** Same SpaceExperience wheel → acceleration burst. */
+function feedSpaceAcceleration(deltaY: number) {
+  const burst = Math.min(0.32, Math.abs(deltaY) / 280);
+  scrollTargetRef.current = Math.min(1, scrollTargetRef.current + burst);
+}
+
+/** Smooth handoff weight during early approach only. */
 function accelerationHandoffWeight(progress: number): number {
   if (progress <= ACCEL_HANDOFF_START) return 1;
   if (progress >= ACCEL_HANDOFF_END) return 0;
   const t =
     (progress - ACCEL_HANDOFF_START) /
     (ACCEL_HANDOFF_END - ACCEL_HANDOFF_START);
-  // Smoothstep so acceleration eases out instead of cutting off
   return 1 - t * t * (3 - 2 * t);
 }
 
@@ -34,22 +46,49 @@ function EarthDiveExperience() {
     if (!root) return;
 
     const onWheel = (event: WheelEvent) => {
-      // Bidirectional scrub: down advances, up reverses the cinematic timeline
-      const next = Math.min(
-        1,
-        Math.max(0, diveTargetRef.current + event.deltaY * DIVE_WHEEL_SCALE),
-      );
-      diveTargetRef.current = next;
+      const target = diveTargetRef.current;
+      const atHero = target >= APPROACH_END - 0.0001;
+      const gateOpen = earthSpinGateOpenRef.current;
 
-      // Early in the sequence, also feed Space-style acceleration (fades out)
-      const weight = accelerationHandoffWeight(diveProgressRef.current);
-      if (weight > 0.001) {
-        const burst = Math.min(0.32, Math.abs(event.deltaY) / 280) * weight;
-        scrollTargetRef.current = Math.min(
-          1,
-          scrollTargetRef.current + burst,
+      // --- Phase 1: approach toward hero ---
+      if (!atHero) {
+        diveTargetRef.current = Math.min(
+          APPROACH_END,
+          Math.max(0, target + event.deltaY * DIVE_WHEEL_SCALE),
         );
+        const weight = accelerationHandoffWeight(diveProgressRef.current);
+        if (weight > 0.001) {
+          const burst =
+            Math.min(0.32, Math.abs(event.deltaY) / 280) * weight;
+          scrollTargetRef.current = Math.min(
+            1,
+            scrollTargetRef.current + burst,
+          );
+        }
+        return;
       }
+
+      // --- Phase 2: hero lock — short Space-style spin, then dive unlocks ---
+      if (!gateOpen) {
+        if (event.deltaY < 0 && earthRotationProgressRef.current < 0.02) {
+          diveTargetRef.current = Math.min(
+            APPROACH_END,
+            Math.max(0, target + event.deltaY * DIVE_WHEEL_SCALE),
+          );
+          return;
+        }
+        feedSpaceAcceleration(event.deltaY);
+        diveTargetRef.current = APPROACH_END;
+        return;
+      }
+
+      // --- Phase 3: dive into glowing right limb / atmosphere ---
+      // Keep feeding Space-style accel so Earth continues spinning naturally
+      feedSpaceAcceleration(event.deltaY);
+      diveTargetRef.current = Math.min(
+        1,
+        Math.max(APPROACH_END, target + event.deltaY * DIVE_WHEEL_SCALE),
+      );
     };
 
     root.addEventListener('wheel', onWheel, { passive: true });
@@ -57,6 +96,10 @@ function EarthDiveExperience() {
       root.removeEventListener('wheel', onWheel);
       diveTargetRef.current = 0;
       diveProgressRef.current = 0;
+      earthRotationProgressRef.current = 0;
+      earthSpinAccumRef.current = 0;
+      earthSpinGateOpenRef.current = false;
+      planetYawDriveRef.current = null;
       scrollTargetRef.current = 0;
       scrollIntensityRef.current = 0;
     };

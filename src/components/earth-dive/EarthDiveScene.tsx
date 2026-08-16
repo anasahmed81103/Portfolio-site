@@ -12,17 +12,21 @@ import {
 } from '../space/earthConfig';
 import EarthDiveController from './EarthDiveController';
 import EarthDiveProgressTicker from './EarthDiveProgressTicker';
+import EarthDivePlanetSpin from './EarthDivePlanetSpin';
 import SunHorizonEffect from './SunHorizonEffect';
+import CloudFlight from './CloudFlight';
+import EarthPenetrationVeil from './EarthPenetrationVeil';
 
 /**
- * Same Earth building blocks as Space, plus dive progress + camera choreography.
- * SpaceScene stays untouched — this is the cinematic approach module.
+ * Earth Dive: approach → short spin → dive into glowing limb / atmosphere.
+ * SpaceScene stays untouched.
  */
 function EarthDiveScene() {
   return (
     <>
       <ScrollAccelerationTicker />
       <EarthDiveProgressTicker />
+      <EarthDivePlanetSpin />
       <EarthDiveController />
 
       <ambientLight intensity={0.035} />
@@ -44,6 +48,8 @@ function EarthDiveScene() {
         </group>
 
         <SunHorizonEffect />
+        <CloudFlight />
+        <EarthPenetrationVeil />
       </Suspense>
     </>
   );

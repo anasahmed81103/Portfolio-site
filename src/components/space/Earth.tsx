@@ -7,6 +7,10 @@ import {
   useScrollAcceleration,
 } from '../../hooks/useScrollAcceleration.ts';
 import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
+import {
+  earthYawReadRef,
+  planetYawDriveRef,
+} from '../../hooks/planetYawDrive';
 
 const EARTH_TEXTURE_URLS = [
   '/textures/earth/earth-day.jpg',
@@ -77,10 +81,17 @@ function Earth() {
 
   useFrame((_, delta) => {
     if (!earthRef.current) return;
-    // Up to ~10× when scroll intensity is max — same +Y axis, never reversed
-    const speed =
-      0.012 * accelerationMultiplier(intensity.current, 10);
-    earthRef.current.rotation.y += delta * speed;
+
+    // Earth Dive spin phase: scroll drives yaw. Space leaves drive null.
+    if (planetYawDriveRef.current !== null) {
+      earthRef.current.rotation.y = planetYawDriveRef.current;
+    } else {
+      const speed =
+        0.012 * accelerationMultiplier(intensity.current, 10);
+      earthRef.current.rotation.y += delta * speed;
+    }
+
+    earthYawReadRef.current = earthRef.current.rotation.y;
   });
 
   return (

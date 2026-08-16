@@ -9,6 +9,8 @@ import {
   Vector3,
 } from 'three';
 import { EARTH_RADIUS, SUN_POSITION } from '../space/earthConfig';
+import { diveProgressRef } from '../../hooks/useDiveProgress';
+import { APPROACH_END, HERO_POSITION } from './earthDivePhases';
 
 /** Soft procedural glow — no external image assets. */
 function createGlowTexture(
@@ -42,10 +44,10 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
 }
 
 /**
- * Must match EarthDiveController hero keyframe D.
+ * Must match EarthDiveController hero pose.
  * Used only to measure how close the live camera is — does not move the camera.
  */
-const HERO_CAMERA_POSITION = new Vector3(2.45, 0.32, 2.95);
+const HERO_CAMERA_POSITION = new Vector3(...HERO_POSITION);
 
 /** Start building earlier in the longer approach so the sun ramp feels gradual. */
 const EFFECT_START_DISTANCE = 4.2;
@@ -178,21 +180,31 @@ function SunHorizonEffect() {
   }, [assets]);
 
   useFrame(() => {
+    const p = diveProgressRef.current;
     const approach = cameraApproach(camera.position);
-    const { horizonBlue, warm, sun, flare, finale } = layerStrengths(approach);
+    const diveT =
+      p > APPROACH_END ? (p - APPROACH_END) / (1 - APPROACH_END) : 0;
+
+    // Hero lock: original look from cameraApproach only.
+    // During dive: hold hero baseline (1) — do NOT jump brighter at dive start.
+    const baseline = diveT > 0 ? 1 : approach;
+    const { horizonBlue, warm, sun, flare, finale } = layerStrengths(baseline);
     const anyVisible = horizonBlue > 0.01 || sun > 0.01 || flare > 0.01;
 
-    _sunDir.copy(SUN_POSITION).normalize();
+    // Growth starts after dive is underway, tracking the zoom-in
+    const diveGrow = smoothstep(0.2, 1, diveT);
 
-    // Glow sits on the atmosphere limb (sun-facing side only)
+    _sunDir.copy(SUN_POSITION).normalize();
     _limbGlow.copy(_sunDir).multiplyScalar(EARTH_RADIUS * 1.02);
 
-    // Visual sun along the real sun ray, just outside the surface…
     _sunPos.copy(_sunDir).multiplyScalar(EARTH_RADIUS * 1.05);
-    // …then pull it AWAY from the camera so Earth occludes it.
-    // Early: deeply hidden. Late: barely offset → peeks past the limb.
     _toCam.copy(camera.position).sub(_sunPos).normalize();
-    const hideBehind = MathUtils.lerp(0.62, 0.04, sun);
+    // Identical hide curve to the pre-dive hero look when diveGrow === 0
+    const hideBehind = MathUtils.lerp(
+      0.62,
+      MathUtils.lerp(0.04, -0.05, diveGrow),
+      sun,
+    );
     _sunPos.addScaledVector(_toCam, -hideBehind);
 
     camera.getWorldDirection(_viewDir);
@@ -230,59 +242,66 @@ function SunHorizonEffect() {
       (sprite.material as SpriteMaterial).opacity = opacity;
     };
 
-    // --- Horizon bloom (limb) ---
+    // Hero sizes/opacities when diveGrow=0; then grow with the dive zoom
     placeAt(
       horizonBlueSprite,
       _limbGlow,
-      1.7 + horizonBlue * 0.55,
-      0.65 + horizonBlue * 0.25,
+      1.7 + horizonBlue * 0.55 + diveGrow * 0.85,
+      0.65 + horizonBlue * 0.25 + diveGrow * 0.32,
       anyVisible,
     );
     placeAt(
       horizonWarm,
       _limbGlow,
-      1.15 + warm * 0.55,
-      0.48 + warm * 0.22,
+      1.15 + warm * 0.55 + diveGrow * 0.65,
+      0.48 + warm * 0.22 + diveGrow * 0.25,
       warm > 0.01,
     );
     placeAt(
       warmScatter,
       _limbGlow,
-      0.75 + warm * 0.45,
-      0.75 + warm * 0.45,
+      0.75 + warm * 0.45 + diveGrow * 0.5,
+      0.75 + warm * 0.45 + diveGrow * 0.5,
       warm > 0.01,
     );
 
-    setOpacity(horizonBlueSprite, horizonBlue * (0.72 + finale * 0.18));
-    setOpacity(horizonWarm, warm * (0.72 + finale * 0.22));
-    setOpacity(warmScatter, warm * (0.48 + finale * 0.2));
+    setOpacity(
+      horizonBlueSprite,
+      horizonBlue * (0.72 + finale * 0.18 + diveGrow * 0.18),
+    );
+    setOpacity(horizonWarm, warm * (0.72 + finale * 0.22 + diveGrow * 0.22));
+    setOpacity(warmScatter, warm * (0.48 + finale * 0.2 + diveGrow * 0.2));
 
-    // --- Sun core / corona ---
-    const coreSize = 0.18 + sun * 0.18 + finale * 0.08;
-    const coronaSize = 0.55 + sun * 0.85 + finale * 0.35;
+    const coreSize = 0.18 + sun * 0.18 + finale * 0.08 + diveGrow * 0.18;
+    const coronaSize = 0.55 + sun * 0.85 + finale * 0.35 + diveGrow * 0.95;
     placeAt(core, _sunPos, coreSize, coreSize, sun > 0.02);
     placeAt(corona, _sunPos, coronaSize, coronaSize, sun > 0.02);
-    setOpacity(core, Math.min(1, sun * (1.05 + finale * 0.2)));
-    setOpacity(corona, sun * (0.62 + finale * 0.28));
+    setOpacity(core, Math.min(1, sun * (1.05 + finale * 0.2 + diveGrow * 0.22)));
+    setOpacity(corona, sun * (0.62 + finale * 0.28 + diveGrow * 0.32));
 
-    // --- Camera flare — builds with approach, max only at final camera pose ---
     const flareAmount = flare * (0.55 + flareBoost * 0.45);
     placeAt(
       flareGlow,
       _sunPos,
-      0.45 + flare * 0.55 + finale * 0.25,
-      0.45 + flare * 0.55 + finale * 0.25,
+      0.45 + flare * 0.55 + finale * 0.25 + diveGrow * 1.3,
+      0.45 + flare * 0.55 + finale * 0.25 + diveGrow * 1.3,
       flareAmount > 0.01,
     );
     placeAt(
       flareStreak,
       _sunPos,
-      1.8 + flare * 1.6 + finale * 0.5,
-      0.055 + flare * 0.045,
+      1.8 + flare * 1.6 + finale * 0.5 + diveGrow * 1.9,
+      0.055 + flare * 0.045 + diveGrow * 0.045,
       flareAmount > 0.01,
     );
-    setOpacity(flareGlow, flareAmount * (0.42 + finale * 0.22));
-    setOpacity(flareStreak, flareAmount * (0.32 + finale * 0.16));
+    setOpacity(
+      flareGlow,
+      Math.min(1, flareAmount * (0.42 + finale * 0.22 + diveGrow * 0.38)),
+    );
+    setOpacity(
+      flareStreak,
+      Math.min(1, flareAmount * (0.32 + finale * 0.16 + diveGrow * 0.3)),
+    );
   });
 
   const { materials } = assets;

@@ -7,6 +7,7 @@ import {
   useScrollAcceleration,
 } from '../../hooks/useScrollAcceleration.ts';
 import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
+import { planetYawDriveRef } from '../../hooks/planetYawDrive';
 
 /** Slightly above the surface so clouds sit in a thin shell, not a second planet. */
 const CLOUD_RADIUS = EARTH_RADIUS * 1.012;
@@ -49,10 +50,15 @@ function CloudLayer() {
 
   useFrame((_, delta) => {
     if (!cloudRef.current) return;
-    // Slightly higher max than Earth so relative cloud drift stays natural
-    const speed =
-      0.018 * accelerationMultiplier(intensity.current, 11);
-    cloudRef.current.rotation.y += delta * speed;
+
+    // Lock to Earth yaw during Earth Dive spin; otherwise keep relative drift
+    if (planetYawDriveRef.current !== null) {
+      cloudRef.current.rotation.y = planetYawDriveRef.current;
+    } else {
+      const speed =
+        0.018 * accelerationMultiplier(intensity.current, 11);
+      cloudRef.current.rotation.y += delta * speed;
+    }
   });
 
   return (
