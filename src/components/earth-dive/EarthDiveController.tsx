@@ -12,12 +12,11 @@ type CameraKeyframe = {
 };
 
 /**
- * Calm cinematic path:
- * hold in space → smooth push toward Earth → soft side slide
- * → half Earth / half space on the day-line limb (sun behind the edge).
+ * Same approved composition (space → close → side → hero limb),
+ * but with smaller steps so the path feels slower and less clunky.
  */
 const KEYFRAMES: readonly CameraKeyframe[] = [
-  // A — establishing space shot
+  // Establishing space shot
   {
     at: 0,
     position: [0, 0, 12.5],
@@ -25,28 +24,59 @@ const KEYFRAMES: readonly CameraKeyframe[] = [
     roll: 0,
   },
   {
-    at: 0.22,
+    at: 0.16,
     position: [0, 0, 12.5],
     lookAt: [0, 0, 0],
     roll: 0,
   },
-  // B — gentle approach (mostly along Z, tiny drift)
+  // Very slow push-in
   {
-    at: 0.48,
-    position: [0.3, 0.1, 5.4],
-    lookAt: [0.05, 0, 0],
+    at: 0.3,
+    position: [0.08, 0.03, 10.2],
+    lookAt: [0.02, 0, 0],
     roll: 0,
   },
-  // C — ease a little to the side as Earth fills the frame
   {
-    at: 0.68,
-    position: [1.45, 0.22, 3.75],
-    lookAt: [0.45, 0.02, -0.2],
+    at: 0.42,
+    position: [0.18, 0.06, 8.1],
+    lookAt: [0.04, 0, 0],
+    roll: 0,
+  },
+  {
+    at: 0.52,
+    position: [0.35, 0.1, 6.4],
+    lookAt: [0.1, 0.01, -0.02],
+    roll: 0,
+  },
+  // Soft side slide begins
+  {
+    at: 0.62,
+    position: [0.75, 0.15, 5.05],
+    lookAt: [0.25, 0.02, -0.08],
+    roll: 0.01,
+  },
+  {
+    at: 0.72,
+    position: [1.25, 0.2, 4.05],
+    lookAt: [0.4, 0.02, -0.18],
     roll: 0.02,
   },
-  // D — half Earth / half space, framed on the day-line with sun behind the limb
   {
-    at: 0.88,
+    at: 0.82,
+    position: [1.85, 0.26, 3.35],
+    lookAt: [0.65, 0.03, -0.4],
+    roll: 0.035,
+  },
+  // Hero limb composition (unchanged payoff pose)
+  {
+    at: 0.92,
+    position: [2.45, 0.32, 2.95],
+    lookAt: [0.9, 0.04, -0.7],
+    roll: 0.05,
+  },
+  // Hold the final frame so the end doesn't feel abrupt
+  {
+    at: 1,
     position: [2.45, 0.32, 2.95],
     lookAt: [0.9, 0.04, -0.7],
     roll: 0.05,
@@ -60,9 +90,10 @@ const _toPos = new Vector3();
 const _fromLook = new Vector3();
 const _toLook = new Vector3();
 
-function smoothstep01(t: number): number {
+/** Quintic smootherstep — softer than smoothstep at the segment ends. */
+function smootherstep01(t: number): number {
   const x = Math.min(1, Math.max(0, t));
-  return x * x * (3 - 2 * x);
+  return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
 function sampleCamera(progress: number): {
@@ -80,7 +111,7 @@ function sampleCamera(progress: number): {
   const a = KEYFRAMES[i];
   const b = KEYFRAMES[Math.min(i + 1, KEYFRAMES.length - 1)];
   const span = b.at - a.at;
-  const localT = span <= 0 ? 1 : smoothstep01((p - a.at) / span);
+  const localT = span <= 0 ? 1 : smootherstep01((p - a.at) / span);
 
   _fromPos.set(...a.position);
   _toPos.set(...b.position);

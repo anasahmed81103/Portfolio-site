@@ -47,8 +47,8 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
  */
 const HERO_CAMERA_POSITION = new Vector3(2.45, 0.32, 2.95);
 
-/** Start building while the camera is still approaching (before the final pose). */
-const EFFECT_START_DISTANCE = 3.4;
+/** Start building earlier in the longer approach so the sun ramp feels gradual. */
+const EFFECT_START_DISTANCE = 4.2;
 /** Full peak when the camera has essentially arrived at the hero pose. */
 const EFFECT_PEAK_DISTANCE = 0.04;
 

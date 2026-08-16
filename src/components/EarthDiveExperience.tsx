@@ -12,8 +12,8 @@ import {
   diveTargetRef,
 } from '../hooks/useDiveProgress';
 
-/** Slightly gentler scrub so the approach feels cinematic, not jumpy. */
-const DIVE_WHEEL_SCALE = 0.00095;
+/** Lower = more scroll needed for the full dive (slower, more cinematic). */
+const DIVE_WHEEL_SCALE = 0.00055;
 
 /** Smooth handoff weight: 1 = full Space acceleration, 0 = dive-only. */
 function accelerationHandoffWeight(progress: number): number {
