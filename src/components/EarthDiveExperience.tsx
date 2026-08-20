@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import EarthDiveScene from './earth-dive/EarthDiveScene';
+import EarthDiveProgressTicker from './earth-dive/EarthDiveProgressTicker';
 import {
   scrollIntensityRef,
   scrollTargetRef,
@@ -16,15 +17,23 @@ import {
   earthRotationProgressRef,
   earthSpinAccumRef,
   earthSpinGateOpenRef,
+  isBookHandoffReady,
 } from './earth-dive/earthDivePhases';
 import { planetYawDriveRef } from '../hooks/planetYawDrive';
 
-/** Approach + dive scrub sensitivity (spin phase does NOT use this). */
+/** Slower scrub while closing in from space — soft, cinematic approach. */
+const APPROACH_WHEEL_SCALE = 0.00028;
+
+/** Dive / flash scrub (after hero lock). */
 const DIVE_WHEEL_SCALE = 0.00055;
 
+/** Extra wheel burst while hero-locked — spin gate unlocks sooner. */
+const SPIN_WHEEL_BURST_SCALE = 2.4;
+
 /** Same SpaceExperience wheel → acceleration burst. */
-function feedSpaceAcceleration(deltaY: number) {
-  const burst = Math.min(0.32, Math.abs(deltaY) / 280);
+function feedSpaceAcceleration(deltaY: number, burstScale = 1) {
+  const burst =
+    Math.min(0.32, Math.abs(deltaY) / 280) * burstScale;
   scrollTargetRef.current = Math.min(1, scrollTargetRef.current + burst);
 }
 
@@ -38,7 +47,25 @@ function accelerationHandoffWeight(progress: number): number {
   return 1 - t * t * (3 - 2 * t);
 }
 
-function EarthDiveExperience() {
+function BookHandoffBridge({ onBookHandoff }: { onBookHandoff?: () => void }) {
+  const firedRef = useRef(false);
+
+  useFrame(() => {
+    if (firedRef.current || !onBookHandoff) return;
+    if (isBookHandoffReady()) {
+      firedRef.current = true;
+      onBookHandoff();
+    }
+  });
+
+  return null;
+}
+
+type EarthDiveExperienceProps = {
+  onBookHandoff?: () => void;
+};
+
+function EarthDiveExperience({ onBookHandoff }: EarthDiveExperienceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,7 +81,7 @@ function EarthDiveExperience() {
       if (!atHero) {
         diveTargetRef.current = Math.min(
           APPROACH_END,
-          Math.max(0, target + event.deltaY * DIVE_WHEEL_SCALE),
+          Math.max(0, target + event.deltaY * APPROACH_WHEEL_SCALE),
         );
         const weight = accelerationHandoffWeight(diveProgressRef.current);
         if (weight > 0.001) {
@@ -73,18 +100,17 @@ function EarthDiveExperience() {
         if (event.deltaY < 0 && earthRotationProgressRef.current < 0.02) {
           diveTargetRef.current = Math.min(
             APPROACH_END,
-            Math.max(0, target + event.deltaY * DIVE_WHEEL_SCALE),
+            Math.max(0, target + event.deltaY * APPROACH_WHEEL_SCALE),
           );
           return;
         }
-        feedSpaceAcceleration(event.deltaY);
+        feedSpaceAcceleration(event.deltaY, SPIN_WHEEL_BURST_SCALE);
         diveTargetRef.current = APPROACH_END;
         return;
       }
 
-      // --- Phase 3: dive into glowing right limb / atmosphere ---
-      // Keep feeding Space-style accel so Earth continues spinning naturally
-      feedSpaceAcceleration(event.deltaY);
+      // --- Phase 3: limb dive → solar flash → Book ---
+      feedSpaceAcceleration(event.deltaY, 1);
       diveTargetRef.current = Math.min(
         1,
         Math.max(APPROACH_END, target + event.deltaY * DIVE_WHEEL_SCALE),
@@ -111,6 +137,8 @@ function EarthDiveExperience() {
         camera={{ position: [0, 0, 12.5], fov: 38, near: 0.1, far: 400 }}
       >
         <color attach="background" args={['#000000']} />
+        <EarthDiveProgressTicker />
+        <BookHandoffBridge onBookHandoff={onBookHandoff} />
         <EarthDiveScene />
       </Canvas>
     </div>

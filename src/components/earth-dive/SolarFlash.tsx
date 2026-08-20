@@ -1,7 +1,13 @@
 import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { DoubleSide, type Mesh, type MeshBasicMaterial, Vector3 } from 'three';
-import { EARTH_RADIUS } from '../space/earthConfig';
+import {
+  Color,
+  DoubleSide,
+  type Mesh,
+  type MeshBasicMaterial,
+  Vector3,
+} from 'three';
+import { getFlashT } from './earthDivePhases';
 
 function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
@@ -9,12 +15,14 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
 }
 
 const _forward = new Vector3();
+const _warmWhite = new Color('#fff4e0');
+const _blueWhite = new Color('#eef6ff');
 
 /**
- * Full-screen atmosphere blue when the camera clips into the Earth mesh,
- * so we never see through the planet geometry.
+ * Scroll-driven blue-white solar flash — final ~15% of the dive.
+ * Camera-locked plane expands to fully opaque before mesh penetration.
  */
-function EarthPenetrationVeil() {
+function SolarFlash() {
   const { camera } = useThree();
   const meshRef = useRef<Mesh>(null);
 
@@ -22,26 +30,29 @@ function EarthPenetrationVeil() {
     const mesh = meshRef.current;
     if (!mesh) return;
 
-    const radius = camera.position.length();
-    // Soft build just outside the surface, then solid once inside the mesh
-    const cover = smoothstep(EARTH_RADIUS * 1.06, EARTH_RADIUS * 0.99, radius);
+    const cover = smoothstep(0, 1, getFlashT());
 
     const mat = mesh.material as MeshBasicMaterial;
     mat.opacity = cover;
-    mesh.visible = cover > 0.01;
+    mesh.visible = cover > 0.005;
 
     if (!mesh.visible) return;
 
     camera.getWorldDirection(_forward);
-    mesh.position.copy(camera.position).addScaledVector(_forward, 0.35);
+    mesh.position.copy(camera.position).addScaledVector(_forward, 0.4);
     mesh.quaternion.copy(camera.quaternion);
+
+    const s = 10 + cover * cover * 22;
+    mesh.scale.set(s, s * 0.65, 1);
+
+    mat.color.copy(_warmWhite).lerp(_blueWhite, cover);
   });
 
   return (
-    <mesh ref={meshRef} visible={false} renderOrder={50}>
-      <planeGeometry args={[20, 12]} />
+    <mesh ref={meshRef} visible={false} renderOrder={55}>
+      <planeGeometry args={[1, 1]} />
       <meshBasicMaterial
-        color="#5aa8e8"
+        color="#fff4e0"
         transparent
         opacity={0}
         depthTest={false}
@@ -53,4 +64,4 @@ function EarthPenetrationVeil() {
   );
 }
 
-export default EarthPenetrationVeil;
+export default SolarFlash;

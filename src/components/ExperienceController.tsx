@@ -7,10 +7,12 @@ import NotebookExperience from './NotebookExperience';
 
 interface ExperienceControllerProps {
   stage: ExperienceStage;
+  onStageChange?: (stage: ExperienceStage) => void;
 }
 
 function ExperienceController({
   stage,
+  onStageChange,
 }: ExperienceControllerProps) {
   switch (stage) {
     case ExperienceStage.Intro:
@@ -20,7 +22,11 @@ function ExperienceController({
       return <SpaceExperience />;
 
     case ExperienceStage.EarthDive:
-      return <EarthDiveExperience />;
+      return (
+        <EarthDiveExperience
+          onBookHandoff={() => onStageChange?.(ExperienceStage.Book)}
+        />
+      );
 
     case ExperienceStage.Book:
       return <BookExperience />;

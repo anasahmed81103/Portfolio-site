@@ -4,28 +4,25 @@ import CloudLayer from '../space/CloudLayer';
 import Atmosphere from '../space/Atmosphere';
 import MilkyWay from '../space/MilkyWay';
 import Starfield from '../space/Starfield';
-import ScrollAccelerationTicker from '../space/ScrollAccelerationTicker';
+import EarthDiveScrollAccelerationTicker from './EarthDiveScrollAccelerationTicker';
 import {
   EARTH_AXIAL_TILT_X,
   EARTH_AXIAL_TILT_Z,
   SUN_POSITION,
 } from '../space/earthConfig';
 import EarthDiveController from './EarthDiveController';
-import EarthDiveProgressTicker from './EarthDiveProgressTicker';
 import EarthDivePlanetSpin from './EarthDivePlanetSpin';
 import SunHorizonEffect from './SunHorizonEffect';
 import CloudFlight from './CloudFlight';
-import EarthPenetrationVeil from './EarthPenetrationVeil';
+import SolarFlash from './SolarFlash';
 
 /**
- * Earth Dive: approach → short spin → dive into glowing limb / atmosphere.
- * SpaceScene stays untouched.
+ * Earth Dive: approach → spin → limb dive → solar flash → Book handoff.
  */
 function EarthDiveScene() {
   return (
     <>
-      <ScrollAccelerationTicker />
-      <EarthDiveProgressTicker />
+      <EarthDiveScrollAccelerationTicker />
       <EarthDivePlanetSpin />
       <EarthDiveController />
 
@@ -49,7 +46,7 @@ function EarthDiveScene() {
 
         <SunHorizonEffect />
         <CloudFlight />
-        <EarthPenetrationVeil />
+        <SolarFlash />
       </Suspense>
     </>
   );

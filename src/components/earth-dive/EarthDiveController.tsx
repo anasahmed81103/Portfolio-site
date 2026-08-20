@@ -17,28 +17,24 @@ type CameraKeyframe = {
   roll: number;
 };
 
-/** Phase 1 — approach to the approved hero horizon. */
+/**
+ * Approach path — final pose is the approved hero shot.
+ * Keep keys sparse; continuous Catmull-Rom does the smoothing
+ * (do NOT ease each segment — that causes the stop-start “jumps”).
+ */
 const APPROACH_KEYFRAMES: readonly CameraKeyframe[] = [
   { at: 0, position: [0, 0, 12.5], lookAt: [0, 0, 0], roll: 0 },
-  { at: 0.16, position: [0, 0, 12.5], lookAt: [0, 0, 0], roll: 0 },
-  { at: 0.3, position: [0.08, 0.03, 10.2], lookAt: [0.02, 0, 0], roll: 0 },
-  { at: 0.42, position: [0.18, 0.06, 8.1], lookAt: [0.04, 0, 0], roll: 0 },
-  { at: 0.52, position: [0.35, 0.1, 6.4], lookAt: [0.1, 0.01, -0.02], roll: 0 },
+  { at: 0.28, position: [0.05, 0.02, 10.6], lookAt: [0.01, 0, 0], roll: 0 },
+  { at: 0.5, position: [0.22, 0.07, 7.8], lookAt: [0.06, 0.01, -0.02], roll: 0 },
   {
-    at: 0.62,
-    position: [0.75, 0.15, 5.05],
-    lookAt: [0.25, 0.02, -0.08],
-    roll: 0.01,
+    at: 0.7,
+    position: [0.85, 0.16, 5.2],
+    lookAt: [0.28, 0.02, -0.1],
+    roll: 0.015,
   },
   {
-    at: 0.72,
-    position: [1.25, 0.2, 4.05],
-    lookAt: [0.4, 0.02, -0.18],
-    roll: 0.02,
-  },
-  {
-    at: 0.82,
-    position: [1.85, 0.26, 3.35],
+    at: 0.88,
+    position: [1.85, 0.26, 3.55],
     lookAt: [0.65, 0.03, -0.4],
     roll: 0.035,
   },
@@ -57,28 +53,69 @@ const APPROACH_KEYFRAMES: readonly CameraKeyframe[] = [
 const LIMB_TARGET = (() => {
   const look = new Vector3(...HERO_LOOK_AT).normalize();
   const sun = SUN_POSITION.clone().normalize();
-  // Mostly the hero limb aim, nudged toward the sunlit atmosphere edge
   look.lerp(sun, 0.22).normalize();
   return look.multiplyScalar(EARTH_RADIUS * 1.02);
 })();
+
+/** Minimum camera radius during dive — stay outside the Earth mesh. */
+const MIN_DIVE_RADIUS = EARTH_RADIUS * 1.06;
 
 /** How close we finish to the limb (0→1 of hero→limb distance). */
 const DIVE_CLOSE_FRACTION = 0.9;
 
 const _pos = new Vector3();
 const _look = new Vector3();
-const _fromPos = new Vector3();
-const _toPos = new Vector3();
-const _fromLook = new Vector3();
-const _toLook = new Vector3();
+const _p0 = new Vector3();
+const _p1 = new Vector3();
+const _p2 = new Vector3();
+const _p3 = new Vector3();
 const _heroPos = new Vector3(...HERO_POSITION);
 const _heroLook = new Vector3(...HERO_LOOK_AT);
-const _diveEnd = new Vector3();
 const _diveDir = new Vector3();
+
+/** Furthest travel along the dive ray that keeps the camera outside Earth. */
+const MAX_DIVE_TRAVEL = (() => {
+  _diveDir.copy(LIMB_TARGET).sub(_heroPos);
+  const fullDist = _diveDir.length() || 1;
+  _diveDir.multiplyScalar(1 / fullDist);
+
+  const candidate = fullDist * DIVE_CLOSE_FRACTION;
+  let safe = 0;
+
+  for (let travel = candidate; travel > 0; travel -= fullDist * 0.004) {
+    _pos.copy(_heroPos).addScaledVector(_diveDir, travel);
+    if (_pos.length() >= MIN_DIVE_RADIUS) {
+      safe = travel;
+      break;
+    }
+  }
+
+  return safe;
+})();
 
 function smootherstep01(t: number): number {
   const x = Math.min(1, Math.max(0, t));
   return x * x * x * (x * (x * 6 - 15) + 10);
+}
+
+/** Catmull-Rom: continuous velocity through waypoints (no per-segment ease). */
+function catmullRom(
+  out: Vector3,
+  p0: Vector3,
+  p1: Vector3,
+  p2: Vector3,
+  p3: Vector3,
+  t: number,
+): Vector3 {
+  const t2 = t * t;
+  const t3 = t2 * t;
+  out
+    .set(0, 0, 0)
+    .addScaledVector(p0, -0.5 * t3 + t2 - 0.5 * t)
+    .addScaledVector(p1, 1.5 * t3 - 2.5 * t2 + 1)
+    .addScaledVector(p2, -1.5 * t3 + 2 * t2 + 0.5 * t)
+    .addScaledVector(p3, 0.5 * t3 - 0.5 * t2);
+  return out;
 }
 
 function sampleKeyframes(
@@ -86,24 +123,41 @@ function sampleKeyframes(
   localT: number,
 ): { position: Vector3; lookAt: Vector3; roll: number } {
   const p = Math.min(1, Math.max(0, localT));
+  const last = keyframes.length - 1;
 
   let i = 0;
-  while (i < keyframes.length - 2 && keyframes[i + 1].at <= p) {
+  while (i < last - 1 && keyframes[i + 1].at <= p) {
     i += 1;
   }
 
   const a = keyframes[i];
-  const b = keyframes[Math.min(i + 1, keyframes.length - 1)];
+  const b = keyframes[Math.min(i + 1, last)];
   const span = b.at - a.at;
-  const t = span <= 0 ? 1 : smootherstep01((p - a.at) / span);
+  // Linear within the segment — overall progress already eases once
+  const t = span <= 0 ? 1 : (p - a.at) / span;
 
-  _fromPos.set(...a.position);
-  _toPos.set(...b.position);
-  _pos.lerpVectors(_fromPos, _toPos, t);
+  const i0 = Math.max(0, i - 1);
+  const i1 = i;
+  const i2 = Math.min(last, i + 1);
+  const i3 = Math.min(last, i + 2);
 
-  _fromLook.set(...a.lookAt);
-  _toLook.set(...b.lookAt);
-  _look.lerpVectors(_fromLook, _toLook, t);
+  catmullRom(
+    _pos,
+    _p0.set(...keyframes[i0].position),
+    _p1.set(...keyframes[i1].position),
+    _p2.set(...keyframes[i2].position),
+    _p3.set(...keyframes[i3].position),
+    t,
+  );
+
+  catmullRom(
+    _look,
+    _p0.set(...keyframes[i0].lookAt),
+    _p1.set(...keyframes[i1].lookAt),
+    _p2.set(...keyframes[i2].lookAt),
+    _p3.set(...keyframes[i3].lookAt),
+    t,
+  );
 
   return {
     position: _pos,
@@ -114,7 +168,7 @@ function sampleKeyframes(
 
 /**
  * Dive toward the glowing horizon / atmosphere edge.
- * Ends close to the limb — a natural handoff into a future atmosphere scene.
+ * Stops just outside the Earth surface — never penetrates the mesh.
  */
 function sampleDiveCamera(diveT: number): {
   position: Vector3;
@@ -127,11 +181,7 @@ function sampleDiveCamera(diveT: number): {
   const fullDist = _diveDir.length() || 1;
   _diveDir.multiplyScalar(1 / fullDist);
 
-  // End just outside the atmosphere shell, looking into the bright rim
-  _diveEnd.copy(_heroPos).addScaledVector(_diveDir, fullDist * DIVE_CLOSE_FRACTION);
-
-  _pos.lerpVectors(_heroPos, _diveEnd, t);
-  // Look shifts from hero framing onto the limb glow / flare
+  _pos.copy(_heroPos).addScaledVector(_diveDir, MAX_DIVE_TRAVEL * t);
   _look.lerpVectors(_heroLook, LIMB_TARGET, Math.min(1, t * 1.1));
 
   return {
@@ -149,7 +199,11 @@ function sampleCamera(progress: number): {
   const p = Math.min(1, Math.max(0, progress));
 
   if (p <= APPROACH_END) {
-    return sampleKeyframes(APPROACH_KEYFRAMES, p / APPROACH_END);
+    // One ease for the whole approach — continuous path, no waypoint stutter
+    return sampleKeyframes(
+      APPROACH_KEYFRAMES,
+      smootherstep01(p / APPROACH_END),
+    );
   }
 
   const diveT = (p - APPROACH_END) / (1 - APPROACH_END);

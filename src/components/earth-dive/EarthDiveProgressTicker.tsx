@@ -3,14 +3,18 @@ import {
   diveProgressRef,
   diveTargetRef,
 } from '../../hooks/useDiveProgress';
+import { APPROACH_END } from './earthDivePhases';
 
 /**
  * Eases diveProgress toward diveTarget each frame (no React state).
- * Lower blend rate = softer catch-up, less “steppy” camera motion.
+ * Approach uses a softer blend so the long push-in from space feels calm;
+ * dive / flash keep a slightly snappier catch-up.
  */
 function EarthDiveProgressTicker() {
   useFrame((_, delta) => {
-    const blend = 1 - Math.exp(-delta * 2.2);
+    const approaching = diveProgressRef.current < APPROACH_END - 0.001;
+    const rate = approaching ? 1.15 : 2.2;
+    const blend = 1 - Math.exp(-delta * rate);
     diveProgressRef.current +=
       (diveTargetRef.current - diveProgressRef.current) * blend;
 

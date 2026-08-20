@@ -10,7 +10,10 @@ function App() {
 
   return (
     <>
-      <ExperienceController stage={currentStage} />
+      <ExperienceController
+        stage={currentStage}
+        onStageChange={setCurrentStage}
+      />
 
       <nav>
         {Object.values(ExperienceStage).map((stage) => (

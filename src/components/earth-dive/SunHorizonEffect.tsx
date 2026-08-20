@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { EARTH_RADIUS, SUN_POSITION } from '../space/earthConfig';
 import { diveProgressRef } from '../../hooks/useDiveProgress';
-import { APPROACH_END, HERO_POSITION } from './earthDivePhases';
+import { APPROACH_END, getFlashT, HERO_POSITION } from './earthDivePhases';
 
 /** Soft procedural glow — no external image assets. */
 function createGlowTexture(
@@ -193,6 +193,7 @@ function SunHorizonEffect() {
 
     // Growth starts after dive is underway, tracking the zoom-in
     const diveGrow = smoothstep(0.2, 1, diveT);
+    const flashBoost = getFlashT();
 
     _sunDir.copy(SUN_POSITION).normalize();
     _limbGlow.copy(_sunDir).multiplyScalar(EARTH_RADIUS * 1.02);
@@ -272,35 +273,49 @@ function SunHorizonEffect() {
     setOpacity(horizonWarm, warm * (0.72 + finale * 0.22 + diveGrow * 0.22));
     setOpacity(warmScatter, warm * (0.48 + finale * 0.2 + diveGrow * 0.2));
 
-    const coreSize = 0.18 + sun * 0.18 + finale * 0.08 + diveGrow * 0.18;
-    const coronaSize = 0.55 + sun * 0.85 + finale * 0.35 + diveGrow * 0.95;
+    const coreSize =
+      0.18 + sun * 0.18 + finale * 0.08 + diveGrow * 0.18 + flashBoost * 0.35;
+    const coronaSize =
+      0.55 + sun * 0.85 + finale * 0.35 + diveGrow * 0.95 + flashBoost * 1.2;
     placeAt(core, _sunPos, coreSize, coreSize, sun > 0.02);
     placeAt(corona, _sunPos, coronaSize, coronaSize, sun > 0.02);
-    setOpacity(core, Math.min(1, sun * (1.05 + finale * 0.2 + diveGrow * 0.22)));
-    setOpacity(corona, sun * (0.62 + finale * 0.28 + diveGrow * 0.32));
+    setOpacity(
+      core,
+      Math.min(1, sun * (1.05 + finale * 0.2 + diveGrow * 0.22 + flashBoost * 0.4)),
+    );
+    setOpacity(
+      corona,
+      sun * (0.62 + finale * 0.28 + diveGrow * 0.32 + flashBoost * 0.55),
+    );
 
     const flareAmount = flare * (0.55 + flareBoost * 0.45);
     placeAt(
       flareGlow,
       _sunPos,
-      0.45 + flare * 0.55 + finale * 0.25 + diveGrow * 1.3,
-      0.45 + flare * 0.55 + finale * 0.25 + diveGrow * 1.3,
+      0.45 + flare * 0.55 + finale * 0.25 + diveGrow * 1.3 + flashBoost * 2.2,
+      0.45 + flare * 0.55 + finale * 0.25 + diveGrow * 1.3 + flashBoost * 2.2,
       flareAmount > 0.01,
     );
     placeAt(
       flareStreak,
       _sunPos,
-      1.8 + flare * 1.6 + finale * 0.5 + diveGrow * 1.9,
-      0.055 + flare * 0.045 + diveGrow * 0.045,
+      1.8 + flare * 1.6 + finale * 0.5 + diveGrow * 1.9 + flashBoost * 3.5,
+      0.055 + flare * 0.045 + diveGrow * 0.045 + flashBoost * 0.08,
       flareAmount > 0.01,
     );
     setOpacity(
       flareGlow,
-      Math.min(1, flareAmount * (0.42 + finale * 0.22 + diveGrow * 0.38)),
+      Math.min(
+        1,
+        flareAmount * (0.42 + finale * 0.22 + diveGrow * 0.38 + flashBoost * 0.65),
+      ),
     );
     setOpacity(
       flareStreak,
-      Math.min(1, flareAmount * (0.32 + finale * 0.16 + diveGrow * 0.3)),
+      Math.min(
+        1,
+        flareAmount * (0.32 + finale * 0.16 + diveGrow * 0.3 + flashBoost * 0.5),
+      ),
     );
   });
 
