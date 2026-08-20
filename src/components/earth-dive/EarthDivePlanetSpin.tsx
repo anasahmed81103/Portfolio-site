@@ -1,61 +1,34 @@
-import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { diveProgressRef } from '../../hooks/useDiveProgress';
 import {
   APPROACH_END,
-  SPIN_NEEDED_RAD,
-  earthRotationProgressRef,
-  earthSpinAccumRef,
+  HERO_SPIN_SECONDS,
   earthSpinGateOpenRef,
+  heroSpinElapsedRef,
 } from './earthDivePhases';
 import { planetYawDriveRef } from '../../hooks/planetYawDrive';
-import { earthYawReadRef } from '../../hooks/planetYawDrive';
-
-const TWO_PI = Math.PI * 2;
 
 /**
- * Tracks Space-style spin until the dive unlocks.
- * Never freezes Earth — yaw drive stays null so scroll keeps spinning it.
+ * At hero lock, count real time. First HERO_SPIN_SECONDS: scroll spins Earth.
+ * After that, open the gate so scroll advances the dive.
  */
 function EarthDivePlanetSpin() {
-  const prevYawRef = useRef<number | null>(null);
-
-  useFrame(() => {
-    // Always let Earth/Clouds use normal scroll-acceleration spin
+  useFrame((_, delta) => {
     planetYawDriveRef.current = null;
 
     const p = diveProgressRef.current;
 
-    if (p < APPROACH_END) {
-      earthSpinAccumRef.current = 0;
-      earthRotationProgressRef.current = 0;
+    if (p < APPROACH_END - 0.0001) {
+      heroSpinElapsedRef.current = 0;
       earthSpinGateOpenRef.current = false;
-      prevYawRef.current = null;
       return;
     }
 
-    // Gate already open — keep spinning naturally, nothing else to track
-    if (earthSpinGateOpenRef.current) {
-      return;
-    }
+    if (earthSpinGateOpenRef.current) return;
 
-    const yaw = earthYawReadRef.current;
-    if (prevYawRef.current !== null) {
-      let dy = yaw - prevYawRef.current;
-      if (dy > Math.PI) dy -= TWO_PI;
-      if (dy < -Math.PI) dy += TWO_PI;
-      if (dy > 0) {
-        earthSpinAccumRef.current += dy;
-      }
-    }
-    prevYawRef.current = yaw;
-
-    earthRotationProgressRef.current = Math.min(
-      1,
-      earthSpinAccumRef.current / SPIN_NEEDED_RAD,
-    );
-
-    if (earthSpinAccumRef.current >= SPIN_NEEDED_RAD) {
+    heroSpinElapsedRef.current += delta;
+    if (heroSpinElapsedRef.current >= HERO_SPIN_SECONDS) {
+      heroSpinElapsedRef.current = HERO_SPIN_SECONDS;
       earthSpinGateOpenRef.current = true;
     }
   });

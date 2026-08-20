@@ -10,17 +10,16 @@ import {
 } from './earthDivePhases';
 
 /**
- * Earth Dive variant — faster catch-up / slower decay while waiting on the
- * hero-lock spin gate so less scrolling is needed to unlock the dive.
+ * Earth Dive scroll acceleration — snappier while waiting in the hero spin window.
  */
 function EarthDiveScrollAccelerationTicker() {
   useFrame((_, delta) => {
-    const inSpinGate =
+    const inSpinWindow =
       diveProgressRef.current >= APPROACH_END - 0.0001 &&
       !earthSpinGateOpenRef.current;
 
-    const decay = inSpinGate ? 0.4 : 1.2;
-    const blendRate = inSpinGate ? 16 : 7;
+    const decay = inSpinWindow ? 0.4 : 1.2;
+    const blendRate = inSpinWindow ? 16 : 7;
 
     scrollTargetRef.current = Math.max(
       0,

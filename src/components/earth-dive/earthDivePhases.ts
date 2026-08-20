@@ -3,7 +3,7 @@ import { diveProgressRef } from '../../hooks/useDiveProgress';
 /**
  * Earth Dive phases on diveProgress (0→1):
  * 0 → APPROACH_END     camera to hero horizon
- * spin (progress frozen) Space-style Earth spin
+ * hero lock            ~5s spin-only window, then dive unlocks
  * APPROACH_END → 1     dive into glowing right limb → solar flash → Book
  */
 export const APPROACH_END = 0.5;
@@ -13,19 +13,16 @@ export const HERO_POSITION = [2.45, 0.32, 2.95] as const;
 export const HERO_LOOK_AT = [0.9, 0.04, -0.7] as const;
 export const HERO_ROLL = 0.05;
 
-/** Short Space-style spin before the dive unlocks (~⅕ turn). */
-export const SPIN_NEEDED_RAD = 0.2;
+/** Seconds of scroll-to-spin at hero before scroll advances the dive. */
+export const HERO_SPIN_SECONDS = 2;
 
 /** Final ~15% of dive — blue-white solar flash builds to full cover. */
 export const FLASH_START = 0.85;
 
-/** 0→1 through the required spin. */
-export const earthRotationProgressRef = { current: 0 };
+/** Seconds spent at hero lock (counts up toward HERO_SPIN_SECONDS). */
+export const heroSpinElapsedRef = { current: 0 };
 
-/** Radians spun since hero lock. */
-export const earthSpinAccumRef = { current: 0 };
-
-/** True after SPIN_NEEDED_RAD — dive scroll may begin. */
+/** True after HERO_SPIN_SECONDS at hero — dive scroll may begin. */
 export const earthSpinGateOpenRef = { current: false };
 
 /** How far through the limb dive (0 before dive, 1 at end). */

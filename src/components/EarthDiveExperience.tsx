@@ -14,9 +14,8 @@ import {
 } from '../hooks/useDiveProgress';
 import {
   APPROACH_END,
-  earthRotationProgressRef,
-  earthSpinAccumRef,
   earthSpinGateOpenRef,
+  heroSpinElapsedRef,
   isBookHandoffReady,
 } from './earth-dive/earthDivePhases';
 import { planetYawDriveRef } from '../hooks/planetYawDrive';
@@ -24,20 +23,18 @@ import { planetYawDriveRef } from '../hooks/planetYawDrive';
 /** Slower scrub while closing in from space — soft, cinematic approach. */
 const APPROACH_WHEEL_SCALE = 0.00028;
 
-/** Dive / flash scrub (after hero lock). */
+/** Dive / flash scrub (after hero lock timer). */
 const DIVE_WHEEL_SCALE = 0.00055;
 
-/** Extra wheel burst while hero-locked — spin gate unlocks sooner. */
+/** Wheel burst while waiting in the hero spin window. */
 const SPIN_WHEEL_BURST_SCALE = 2.4;
 
-/** Same SpaceExperience wheel → acceleration burst. */
 function feedSpaceAcceleration(deltaY: number, burstScale = 1) {
   const burst =
     Math.min(0.32, Math.abs(deltaY) / 280) * burstScale;
   scrollTargetRef.current = Math.min(1, scrollTargetRef.current + burst);
 }
 
-/** Smooth handoff weight during early approach only. */
 function accelerationHandoffWeight(progress: number): number {
   if (progress <= ACCEL_HANDOFF_START) return 1;
   if (progress >= ACCEL_HANDOFF_END) return 0;
@@ -95,9 +92,11 @@ function EarthDiveExperience({ onBookHandoff }: EarthDiveExperienceProps) {
         return;
       }
 
-      // --- Phase 2: hero lock — short Space-style spin, then dive unlocks ---
+      // --- Phase 2: hero lock — first ~2s scroll only spins Earth ---
       if (!gateOpen) {
-        if (event.deltaY < 0 && earthRotationProgressRef.current < 0.02) {
+        diveTargetRef.current = APPROACH_END;
+        if (event.deltaY < 0) {
+          // Allow a little back-off toward space approach
           diveTargetRef.current = Math.min(
             APPROACH_END,
             Math.max(0, target + event.deltaY * APPROACH_WHEEL_SCALE),
@@ -105,7 +104,6 @@ function EarthDiveExperience({ onBookHandoff }: EarthDiveExperienceProps) {
           return;
         }
         feedSpaceAcceleration(event.deltaY, SPIN_WHEEL_BURST_SCALE);
-        diveTargetRef.current = APPROACH_END;
         return;
       }
 
@@ -122,8 +120,7 @@ function EarthDiveExperience({ onBookHandoff }: EarthDiveExperienceProps) {
       root.removeEventListener('wheel', onWheel);
       diveTargetRef.current = 0;
       diveProgressRef.current = 0;
-      earthRotationProgressRef.current = 0;
-      earthSpinAccumRef.current = 0;
+      heroSpinElapsedRef.current = 0;
       earthSpinGateOpenRef.current = false;
       planetYawDriveRef.current = null;
       scrollTargetRef.current = 0;
