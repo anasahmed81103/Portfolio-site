@@ -14,9 +14,13 @@ function SpaceExperience() {
     if (!root) return;
 
     const onWheel = (event: WheelEvent) => {
-      // Direction ignored — only scroll magnitude builds acceleration
+      // Scroll down boosts natural (forward) spin; scroll up reverses it.
       const burst = Math.min(0.32, Math.abs(event.deltaY) / 280);
-      scrollTargetRef.current = Math.min(1, scrollTargetRef.current + burst);
+      const signedBurst = event.deltaY < 0 ? -burst : burst;
+      scrollTargetRef.current = Math.max(
+        -1,
+        Math.min(1, scrollTargetRef.current + signedBurst),
+      );
     };
 
     root.addEventListener('wheel', onWheel, { passive: true });

@@ -219,6 +219,8 @@ function Starfield() {
 
   useFrame((_, delta) => {
     const scroll = intensity.current;
+    const scrollMag = Math.abs(scroll);
+    // Signed: scroll-up reverses star drift with Earth / clouds
     const driftBoost = accelerationMultiplier(scroll, 25);
 
     // Same-direction drift for all tiers
@@ -235,13 +237,13 @@ function Starfield() {
         delta * LARGE_CONFIG.driftBase * driftBoost;
     }
 
-    // Shared anim clock — scroll makes every size tier twinkle faster
-    animTimeRef.current += delta * (1 + scroll * 5);
+    // Twinkle uses magnitude so reverse scroll still energizes the sky
+    animTimeRef.current += delta * (1 + scrollMag * 5);
     const time = animTimeRef.current;
 
-    const shimmerBoost = scroll * 0.35;
-    const flarePowerDrop = scroll * 2.2;
-    const flareAmp = scroll * 1.25;
+    const shimmerBoost = scrollMag * 0.35;
+    const flarePowerDrop = scrollMag * 2.2;
+    const flareAmp = scrollMag * 1.25;
 
     updateLayerTwinkle(
       layers.small,
