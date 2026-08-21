@@ -16,14 +16,13 @@ type SpaceVisionRevealProps = {
 function SpaceVisionReveal({ skipEntrance = false }: SpaceVisionRevealProps) {
   const ambientRef = useRef<AmbientLight>(null);
   const sunRef = useRef<DirectionalLight>(null);
-  const skipEntranceRef = useRef(skipEntrance);
 
   useLayoutEffect(() => {
     const ambient = ambientRef.current;
     const sun = sunRef.current;
     if (!ambient || !sun) return;
 
-    if (skipEntranceRef.current) {
+    if (skipEntrance) {
       ambient.intensity = 0.035;
       sun.intensity = 2.4;
       return;
@@ -58,17 +57,15 @@ function SpaceVisionReveal({ skipEntrance = false }: SpaceVisionRevealProps) {
     });
 
     return () => ctx.revert();
-  }, []);
-
-  const lit = skipEntranceRef.current;
+  }, [skipEntrance]);
 
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={lit ? 0.035 : 0} />
+      <ambientLight ref={ambientRef} intensity={skipEntrance ? 0.035 : 0} />
       <directionalLight
         ref={sunRef}
         position={SUN_POSITION.toArray()}
-        intensity={lit ? 2.4 : 0}
+        intensity={skipEntrance ? 2.4 : 0}
         color="#fff2dd"
       />
     </>

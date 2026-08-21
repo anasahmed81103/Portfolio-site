@@ -1,0 +1,1015 @@
+/* Living newspaper portfolio — editorial print system */
+
+.notebook-experience {
+  --np-paper: #efe6d4;
+  --np-paper-deep: #e4d8c2;
+  --np-ink: #1a1510;
+  --np-ink-soft: rgba(26, 21, 16, 0.72);
+  --np-ink-faint: rgba(26, 21, 16, 0.42);
+  --np-rule: rgba(26, 21, 16, 0.7);
+  --np-accent: #2f4f73;
+  --np-margin: #8f3d36;
+  --np-photo-bg: #d7ccb6;
+
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #2a241c;
+  color: var(--np-ink);
+}
+
+.notebook-flash-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: #eef6ff;
+}
+
+.np-stage {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: clamp(0.75rem, 2vw, 1.5rem) clamp(0.6rem, 2vw, 1.25rem) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.np-sheet {
+  width: min(100%, 68rem);
+  transform-origin: center top;
+  will-change: transform, opacity;
+}
+
+/* ---------- Page sheet ---------- */
+
+.np-page {
+  position: relative;
+  background: var(--np-paper);
+  color: var(--np-ink);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 240, 0.35) inset,
+    0 18px 50px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(26, 21, 16, 0.12);
+  min-height: min(92vh, 56rem);
+  padding: clamp(1rem, 2.4vw, 1.75rem) clamp(0.9rem, 2.2vw, 1.85rem)
+    clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.np-page-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(255, 255, 255, 0.28),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 10% 100%,
+      rgba(120, 90, 50, 0.12),
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse at 90% 80%,
+      rgba(90, 70, 40, 0.1),
+      transparent 40%
+    );
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
+.np-page-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+.np-page-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.np-folio {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.65rem;
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.68rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--np-ink-faint);
+  z-index: 2;
+}
+
+/* ---------- Rules & type primitives ---------- */
+
+.np-double-rule {
+  height: 5px;
+  margin: 0.65rem 0 0.85rem;
+  border-top: 2px solid var(--np-ink);
+  border-bottom: 1px solid var(--np-ink);
+  opacity: 0.85;
+}
+
+.np-headline {
+  margin: 0 0 0.35rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.np-headline-xl {
+  font-size: clamp(1.55rem, 3.6vw, 2.35rem);
+  line-height: 1.08;
+}
+
+.np-dek {
+  margin: 0 0 0.4rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.92rem, 1.7vw, 1.05rem);
+  font-style: italic;
+  color: var(--np-ink-soft);
+  line-height: 1.4;
+}
+
+.np-byline {
+  margin: 0 0 0.65rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--np-ink-faint);
+}
+
+.np-kicker {
+  margin: 0 0 0.25rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--np-accent);
+}
+
+.np-article-body {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.86rem, 1.5vw, 0.95rem);
+  line-height: 1.55;
+  color: var(--np-ink-soft);
+}
+
+.np-article-body p {
+  margin: 0 0 0.7rem;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.np-article-dropcap .np-article-body > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.1em;
+  line-height: 0.8;
+  padding: 0.08em 0.1em 0 0;
+  font-weight: 700;
+  color: var(--np-ink);
+}
+
+.np-display-headline {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 8vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.np-display-headline-sm {
+  font-size: clamp(1.7rem, 5vw, 2.8rem);
+}
+
+.np-display-sub {
+  margin: 0.45rem 0 0;
+  text-align: center;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+  font-style: italic;
+  color: var(--np-ink-soft);
+}
+
+.np-continued {
+  font-style: italic;
+  color: var(--np-accent) !important;
+}
+
+.np-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  margin: 0.35rem 0 0.65rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-ink-faint);
+}
+
+.np-meta-line span::before {
+  content: '· ';
+  opacity: 0.5;
+}
+
+.np-meta-line span:first-child::before {
+  content: '';
+}
+
+.np-annotation {
+  margin: 0.4rem 0;
+  font-family: 'Caveat', cursive;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: var(--np-margin);
+  transform: rotate(-2deg);
+  line-height: 1.2;
+}
+
+.np-page-intro {
+  margin: 0 0 1rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--np-ink-soft);
+  text-align: center;
+}
+
+.np-bullet-list {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.np-bullet-list li {
+  margin-bottom: 0.35rem;
+}
+
+/* ---------- Header / masthead ---------- */
+
+.np-header-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.62rem, 1.4vw, 0.72rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--np-ink-faint);
+}
+
+.np-header-name {
+  font-weight: 700;
+  color: var(--np-ink-soft);
+  letter-spacing: 0.12em;
+}
+
+.np-masthead-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: clamp(0.5rem, 2vw, 1.25rem);
+  margin-top: 0.55rem;
+}
+
+.np-masthead-ornament {
+  width: clamp(42px, 8vw, 64px);
+  color: var(--np-ink);
+  opacity: 0.85;
+}
+
+.np-masthead-ornament svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.np-masthead-center {
+  text-align: center;
+  min-width: 0;
+}
+
+.np-masthead-kicker {
+  margin: 0 0 0.2rem;
+  font-family: 'Caveat', cursive;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  color: var(--np-accent);
+}
+
+.np-masthead-title {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: clamp(1.35rem, 4.2vw, 2.65rem);
+  line-height: 1.05;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.np-masthead-date {
+  margin: 0.35rem 0 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.72rem, 1.5vw, 0.85rem);
+  font-style: italic;
+  color: var(--np-ink-soft);
+}
+
+.np-section-banner {
+  margin: 0.55rem 0 0;
+  text-align: center;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(1.4rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Photos ---------- */
+
+.np-photo {
+  margin: 0;
+}
+
+.np-photo-frame {
+  border: 1.5px solid var(--np-ink);
+  padding: 0.35rem;
+  background: rgba(255, 252, 245, 0.45);
+  box-shadow: 1px 1px 0 rgba(26, 21, 16, 0.15);
+}
+
+.np-photo-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.05) grayscale(0.15) sepia(0.12);
+}
+
+.np-photo-placeholder {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  background:
+    repeating-linear-gradient(
+      -12deg,
+      transparent,
+      transparent 6px,
+      rgba(26, 21, 16, 0.04) 6px,
+      rgba(26, 21, 16, 0.04) 7px
+    ),
+    var(--np-photo-bg);
+  color: var(--np-ink-faint);
+  text-align: center;
+  padding: 1rem;
+}
+
+.np-photo-portrait .np-photo-placeholder,
+.np-photo-portrait .np-photo-img {
+  aspect-ratio: 3 / 4;
+}
+
+.np-photo-landscape .np-photo-placeholder,
+.np-photo-landscape .np-photo-img {
+  aspect-ratio: 4 / 3;
+}
+
+.np-photo-square .np-photo-placeholder,
+.np-photo-square .np-photo-img {
+  aspect-ratio: 1;
+}
+
+.np-photo-wide .np-photo-placeholder,
+.np-photo-wide .np-photo-img {
+  aspect-ratio: 16 / 10;
+}
+
+.np-photo-placeholder-mark {
+  font-size: 1.4rem;
+  opacity: 0.55;
+}
+
+.np-photo-placeholder-label {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.np-photo-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--np-ink-soft);
+}
+
+.np-photo-credit {
+  flex-shrink: 0;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  color: var(--np-ink-faint);
+}
+
+/* ---------- Slideshow ---------- */
+
+.np-slideshow-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.np-slideshow-btn {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid rgba(26, 21, 16, 0.35);
+  color: var(--np-ink);
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+}
+
+.np-slideshow-btn:hover {
+  background: rgba(26, 21, 16, 0.06);
+}
+
+.np-slideshow-dots {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.np-slideshow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(26, 21, 16, 0.25);
+}
+
+.np-slideshow-dot.is-active {
+  background: var(--np-ink);
+}
+
+/* ---------- Front page ---------- */
+
+.np-front-hero {
+  margin: 0.35rem 0 0.85rem;
+}
+
+.np-front-grid {
+  display: grid;
+  gap: 1rem 1.25rem;
+}
+
+.np-front-main {
+  position: relative;
+}
+
+.np-front-note {
+  position: absolute;
+  left: -0.25rem;
+  bottom: 2.5rem;
+}
+
+.np-teasers-label {
+  margin: 0 0 0.65rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--np-ink-faint);
+}
+
+.np-teaser-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.np-teaser {
+  border-top: 1px solid rgba(26, 21, 16, 0.35);
+  padding-top: 0.55rem;
+}
+
+.np-teaser-kicker {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--np-accent);
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+}
+
+.np-teaser-title {
+  margin: 0.2rem 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.np-teaser-text {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--np-ink-soft);
+  line-height: 1.4;
+}
+
+/* ---------- About ---------- */
+
+.np-about-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.np-about-copy {
+  display: grid;
+  gap: 1rem;
+}
+
+.np-about-note {
+  margin-top: 0.5rem;
+}
+
+/* ---------- Experience ---------- */
+
+.np-experience-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.np-experience-item {
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(26, 21, 16, 0.22);
+}
+
+.np-experience-item:last-child {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
+.np-experience-lead {
+  font-style: italic;
+  color: var(--np-ink) !important;
+}
+
+.np-experience-rail {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.np-sidebar-box {
+  border: 1.5px solid var(--np-ink);
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 252, 245, 0.35);
+}
+
+.np-sidebar-title {
+  margin: 0 0 0.35rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.np-sidebar-box p {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--np-ink-soft);
+}
+
+/* ---------- Projects ---------- */
+
+.np-project-lead {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.np-project-grid {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.np-project-card {
+  padding-top: 0.25rem;
+}
+
+.np-project-card .np-headline {
+  margin-top: 0.55rem;
+}
+
+.np-project-card p {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--np-ink-soft);
+}
+
+.np-project-inline {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.np-projects-note {
+  margin-top: 0.35rem;
+}
+
+/* ---------- Education / skills ---------- */
+
+.np-education-layout {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.np-education-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid rgba(26, 21, 16, 0.25);
+  padding-top: 0.75rem;
+}
+
+.np-fact-label {
+  margin: 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--np-ink-faint);
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+}
+
+.np-fact-value {
+  margin: 0.15rem 0 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--np-ink);
+}
+
+.np-skills-banner {
+  margin: 0 0 0.85rem;
+  text-align: center;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.np-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem 1.25rem;
+  border: 1.5px solid var(--np-ink);
+  padding: 0.85rem 1rem;
+}
+
+.np-skills-col-title {
+  margin: 0 0 0.4rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(26, 21, 16, 0.3);
+  padding-bottom: 0.25rem;
+}
+
+.np-skills-col ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.np-skills-col li {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.88rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px dotted rgba(26, 21, 16, 0.2);
+  color: var(--np-ink-soft);
+}
+
+/* ---------- Closing ---------- */
+
+.np-closing-hero {
+  margin-bottom: 1.15rem;
+}
+
+.np-closing-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.np-closing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.85rem !important;
+}
+
+.np-print-btn {
+  display: inline-block;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--np-paper);
+  background: var(--np-ink);
+  border: 1.5px solid var(--np-ink);
+  padding: 0.55rem 0.9rem;
+}
+
+.np-print-btn-ghost {
+  color: var(--np-ink);
+  background: transparent;
+}
+
+.np-print-btn:hover {
+  opacity: 0.88;
+}
+
+.np-contact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.np-contact-list li {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(26, 21, 16, 0.18);
+}
+
+.np-contact-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--np-ink-faint);
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+}
+
+.np-contact-list a {
+  color: var(--np-ink);
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.95rem;
+}
+
+.np-closing-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.np-closing-message {
+  margin: 0.85rem auto 0.35rem;
+  max-width: 36rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--np-ink-soft);
+}
+
+.np-closing-note {
+  display: inline-block;
+  color: var(--np-accent);
+}
+
+.np-closing-colophon {
+  margin: 1rem 0 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--np-ink-faint);
+}
+
+/* ---------- Page navigation ---------- */
+
+.np-nav {
+  width: min(100%, 68rem);
+  margin: 0.85rem auto 1.25rem;
+  padding: 0.65rem 0.75rem 0.85rem;
+  background: rgba(239, 230, 212, 0.92);
+  border: 1.5px solid rgba(26, 21, 16, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+  position: sticky;
+  bottom: 0.5rem;
+  z-index: 5;
+}
+
+.np-nav-turn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.np-nav-btn {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--np-ink);
+  color: var(--np-paper);
+  border: 1.5px solid var(--np-ink);
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+}
+
+.np-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.np-nav-btn:not(:disabled):hover {
+  opacity: 0.88;
+}
+
+.np-nav-status {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--np-ink-soft);
+  text-align: center;
+}
+
+.np-nav-index {
+  list-style: none;
+  margin: 0;
+  padding: 0.45rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.25rem;
+  border-top: 1px solid rgba(26, 21, 16, 0.25);
+}
+
+.np-nav-index-btn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.35rem 0.15rem;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid rgba(26, 21, 16, 0.15);
+  cursor: pointer;
+  color: var(--np-ink-soft);
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+}
+
+.np-nav-index li:last-child .np-nav-index-btn {
+  border-right: 0;
+}
+
+.np-nav-index-btn.is-active {
+  color: var(--np-ink);
+  background: rgba(26, 21, 16, 0.06);
+}
+
+.np-nav-index-label {
+  font-size: clamp(0.58rem, 1.5vw, 0.68rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.np-nav-index-num {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* ---------- Responsive editorial grids ---------- */
+
+@media (min-width: 760px) {
+  .np-front-grid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+    align-items: start;
+  }
+
+  .np-teaser-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.85rem;
+  }
+
+  .np-teaser {
+    border-top: 0;
+    border-left: 1px solid rgba(26, 21, 16, 0.28);
+    padding: 0 0 0 0.75rem;
+  }
+
+  .np-teaser:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .np-about-layout {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+
+  .np-experience-layout {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.75fr);
+    align-items: start;
+  }
+
+  .np-project-lead {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: start;
+  }
+
+  .np-project-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .np-project-card-wide {
+    grid-column: 1 / -1;
+  }
+
+  .np-project-inline {
+    grid-template-columns: minmax(0, 0.55fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .np-education-layout {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+    align-items: start;
+  }
+
+  .np-skills-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .np-closing-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .np-masthead-ornament {
+    display: none;
+  }
+
+  .np-masthead-row {
+    grid-template-columns: 1fr;
+  }
+
+  .np-education-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .np-nav-index-label {
+    font-size: 0.52rem;
+  }
+
+  .np-nav-btn {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.68rem;
+  }
+
+  .np-front-note,
+  .np-about-note,
+  .np-projects-note {
+    position: static;
+    transform: rotate(-1deg);
+  }
+}

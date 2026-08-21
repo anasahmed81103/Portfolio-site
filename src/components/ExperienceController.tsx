@@ -1,7 +1,6 @@
 import { ExperienceStage } from '../app/experience';
 import IntroExperience from './IntroExperience';
 import OrbitalExperience from './OrbitalExperience';
-import BookExperience from './BookExperience';
 import NotebookExperience from './NotebookExperience';
 
 interface ExperienceControllerProps {
@@ -30,12 +29,9 @@ function ExperienceController({
           onProgressToDive={() =>
             onStageChange?.(ExperienceStage.EarthDive)
           }
-          onBookHandoff={() => onStageChange?.(ExperienceStage.Book)}
+          onBookHandoff={() => onStageChange?.(ExperienceStage.Notebook)}
         />
       );
-
-    case ExperienceStage.Book:
-      return <BookExperience />;
 
     case ExperienceStage.Notebook:
       return <NotebookExperience />;

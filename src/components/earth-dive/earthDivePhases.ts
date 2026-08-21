@@ -4,7 +4,7 @@ import { diveProgressRef } from '../../hooks/useDiveProgress';
  * Earth Dive phases on diveProgress (0→1):
  * 0 → APPROACH_END     camera to hero horizon
  * hero lock            ~5s spin-only window, then dive unlocks
- * APPROACH_END → 1     dive into glowing right limb → solar flash → Book
+ * APPROACH_END → 1     dive into glowing right limb → solar flash → Notebook
  */
 export const APPROACH_END = 0.5;
 
@@ -39,7 +39,7 @@ export function getFlashT(): number {
   return Math.min(1, (p - FLASH_START) / (1 - FLASH_START));
 }
 
-/** True when flash is fully opaque — hand off to Book stage. */
+/** True when flash is fully opaque — hand off to Notebook / portfolio stage. */
 export function isBookHandoffReady(): boolean {
   return getFlashT() >= 0.995;
 }

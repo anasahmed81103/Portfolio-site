@@ -74,8 +74,8 @@ function OrbitalExperience({
   const [exiting, setExiting] = useState(false);
 
   const isDive = stage === ExperienceStage.EarthDive;
-  // If we mount already in dive (dev jump), skip the space vision entrance.
-  const skipVisionRevealRef = useRef(isDive);
+  // Capture mount-time stage once — Space→Dive must not remount the vision veil.
+  const [skipVisionReveal] = useState(isDive);
 
   const handleProgress = useCallback(() => {
     if (lockedRef.current || !onProgressToDive || isDive) return;
@@ -88,7 +88,7 @@ function OrbitalExperience({
 
   // Space entrance veil — only when starting in Space, not on dive-first mount.
   useLayoutEffect(() => {
-    if (skipVisionRevealRef.current) return;
+    if (skipVisionReveal) return;
 
     const veil = veilRef.current;
     if (!veil) return;
@@ -149,7 +149,7 @@ function OrbitalExperience({
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [skipVisionReveal]);
 
   // Space wheel — inactive once dive takes over.
   useEffect(() => {
@@ -244,12 +244,12 @@ function OrbitalExperience({
         <color attach="background" args={['#000000']} />
         <OrbitalScene
           mode={isDive ? 'dive' : 'space'}
-          skipVisionReveal={skipVisionRevealRef.current}
+          skipVisionReveal={skipVisionReveal}
           onBookHandoff={onBookHandoff}
         />
       </Canvas>
 
-      {!skipVisionRevealRef.current ? (
+      {!skipVisionReveal ? (
         <div ref={veilRef} className="space-vision-veil" aria-hidden="true">
           <div className="space-vision-veil-core" />
           <div className="space-vision-veil-soft" />
