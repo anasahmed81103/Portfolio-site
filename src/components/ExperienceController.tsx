@@ -1,7 +1,6 @@
 import { ExperienceStage } from '../app/experience';
 import IntroExperience from './IntroExperience';
-import SpaceExperience from './SpaceExperience';
-import EarthDiveExperience from './EarthDiveExperience';
+import OrbitalExperience from './OrbitalExperience';
 import BookExperience from './BookExperience';
 import NotebookExperience from './NotebookExperience';
 
@@ -22,12 +21,15 @@ function ExperienceController({
         />
       );
 
+    // Same component instance for Space → Earth Dive keeps one Canvas alive.
     case ExperienceStage.Space:
-      return <SpaceExperience />;
-
     case ExperienceStage.EarthDive:
       return (
-        <EarthDiveExperience
+        <OrbitalExperience
+          stage={stage}
+          onProgressToDive={() =>
+            onStageChange?.(ExperienceStage.EarthDive)
+          }
           onBookHandoff={() => onStageChange?.(ExperienceStage.Book)}
         />
       );

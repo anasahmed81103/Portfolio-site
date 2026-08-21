@@ -3,18 +3,31 @@ import gsap from 'gsap';
 import type { AmbientLight, DirectionalLight } from 'three';
 import { SUN_POSITION } from './earthConfig';
 
+type SpaceVisionRevealProps = {
+  /** Skip the dark→lit entrance (e.g. debug jump straight into Earth Dive). */
+  skipEntrance?: boolean;
+};
+
 /**
  * Staged space entrance: stars shimmer in the dark first;
  * sunlight / ambient ease up much later so Earth resolves gently.
+ * Lights stay mounted for the Space → Dive handoff (no remount flash).
  */
-function SpaceVisionReveal() {
+function SpaceVisionReveal({ skipEntrance = false }: SpaceVisionRevealProps) {
   const ambientRef = useRef<AmbientLight>(null);
   const sunRef = useRef<DirectionalLight>(null);
+  const skipEntranceRef = useRef(skipEntrance);
 
   useLayoutEffect(() => {
     const ambient = ambientRef.current;
     const sun = sunRef.current;
     if (!ambient || !sun) return;
+
+    if (skipEntranceRef.current) {
+      ambient.intensity = 0.035;
+      sun.intensity = 2.4;
+      return;
+    }
 
     const ctx = gsap.context(() => {
       gsap.set(ambient, { intensity: 0 });
@@ -47,13 +60,15 @@ function SpaceVisionReveal() {
     return () => ctx.revert();
   }, []);
 
+  const lit = skipEntranceRef.current;
+
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={0} />
+      <ambientLight ref={ambientRef} intensity={lit ? 0.035 : 0} />
       <directionalLight
         ref={sunRef}
         position={SUN_POSITION.toArray()}
-        intensity={0}
+        intensity={lit ? 2.4 : 0}
         color="#fff2dd"
       />
     </>
