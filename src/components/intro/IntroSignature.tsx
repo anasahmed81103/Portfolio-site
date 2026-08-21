@@ -80,8 +80,8 @@ function IntroSignature() {
         </g>
       </svg>
 
-      <p className="intro-signature-caption">
-        sketched somewhere between coffee &amp; code
+      <p className="intro-subtitle">
+        Full-Stack Developer · AI / Computer Vision
       </p>
     </div>
   );

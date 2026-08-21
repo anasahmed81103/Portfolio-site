@@ -108,13 +108,17 @@
   stroke-width: 1.8;
 }
 
-.intro-signature-caption {
-  margin: 0;
+.intro-subtitle {
+  margin: 0.15rem 0 0;
+  max-width: min(92vw, 28rem);
   font-family: 'Caveat', cursive;
-  font-size: clamp(1.05rem, 2.4vw, 1.45rem);
-  color: rgba(43, 36, 28, 0.55);
-  letter-spacing: 0.02em;
-  transform: rotate(-2deg);
+  font-size: clamp(1.15rem, 2.6vw, 1.55rem);
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  color: rgba(43, 36, 28, 0.62);
+  letter-spacing: 0.01em;
+  transform: rotate(-1.5deg);
 }
 
 /* ---------- Doodles ---------- */
@@ -134,88 +138,150 @@
   will-change: transform, opacity;
 }
 
-.intro-doodle-star {
-  top: 9%;
-  left: 18%;
-  width: clamp(34px, 5vw, 52px);
+.intro-doodle-stroke {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+}
+
+.intro-doodle-python {
+  top: 56%;
+  left: clamp(7%, 10vw, 13%);
+  width: clamp(52px, 8vw, 72px);
   color: var(--pen-blue);
+  transform: rotate(-10deg);
 }
 
-.intro-doodle-star-sm {
-  top: 16%;
-  right: 16%;
-  width: clamp(22px, 3.5vw, 34px);
-  color: var(--pen-red);
-}
-
-.intro-doodle-rocket {
-  top: 22%;
-  left: 7%;
-  width: clamp(48px, 7vw, 72px);
+.intro-doodle-react {
+  top: 24%;
+  left: clamp(8%, 11vw, 14%);
+  width: clamp(58px, 9vw, 78px);
   color: var(--pen-blue);
+  transform: rotate(-6deg);
 }
 
-.intro-doodle-planet {
-  top: 12%;
-  right: 8%;
-  width: clamp(64px, 9vw, 96px);
-  color: var(--pen-green);
-}
-
-.intro-doodle-coffee {
-  bottom: 18%;
-  left: 10%;
-  width: clamp(44px, 6.5vw, 68px);
-  color: var(--ink);
-}
-
-.intro-doodle-code {
-  top: 38%;
-  right: 6%;
-  width: clamp(52px, 7.5vw, 78px);
-  color: var(--pen-blue);
-}
-
-.intro-doodle-plane {
-  bottom: 28%;
-  right: 14%;
-  width: clamp(70px, 10vw, 100px);
-  color: var(--ink);
-}
-
-.intro-doodle-heart {
-  top: 48%;
-  left: 5%;
-  width: clamp(32px, 4.5vw, 46px);
-  color: var(--pen-red);
-}
-
-.intro-doodle-arrow {
-  top: 30%;
-  left: 28%;
-  width: clamp(70px, 10vw, 110px);
-  color: var(--pen-red);
-}
-
-.intro-doodle-squiggle {
-  bottom: 14%;
-  right: 28%;
-  width: clamp(80px, 12vw, 130px);
-  color: var(--pen-blue);
-}
-
-.intro-doodle-bulb {
-  bottom: 12%;
-  left: 28%;
-  width: clamp(36px, 5vw, 52px);
-  color: #b8860b;
-}
-
-.intro-doodle-smiley {
+.intro-doodle-cap {
   top: 58%;
-  right: 9%;
-  width: clamp(40px, 6vw, 58px);
+  right: clamp(10%, 14vw, 18%);
+  width: clamp(48px, 7.5vw, 68px);
+  color: var(--ink);
+  transform: rotate(8deg);
+}
+
+/* Parked for a later intro → space fly-off (nose toward upper-right edge). */
+.intro-transition-plane {
+  top: 10%;
+  right: clamp(2%, 4vw, 7%);
+  width: clamp(110px, 16vw, 168px);
+  color: var(--ink);
+  transform: rotate(-28deg);
+}
+
+/* ---------- Diary annotations ---------- */
+
+.intro-annotations {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.intro-note {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--pen-red);
+  will-change: transform, opacity;
+}
+
+.intro-note-text {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(0.95rem, 2vw, 1.2rem);
+  line-height: 1;
+  white-space: nowrap;
+  color: rgba(43, 36, 28, 0.58);
+}
+
+.intro-note-arrow {
+  width: clamp(48px, 7vw, 72px);
+  height: auto;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.intro-annotation-stroke {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+}
+
+.intro-note-debater {
+  top: 20%;
+  left: clamp(20%, 26vw, 34%);
+  flex-direction: column;
+  align-items: flex-start;
+  transform: rotate(-7deg);
+  color: var(--pen-red);
+}
+
+.intro-note-debater .intro-note-text {
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  color: rgba(180, 83, 75, 0.78);
+}
+
+.intro-note-yis {
+  top: 48%;
+  left: clamp(4%, 7vw, 11%);
+  flex-direction: column;
+  align-items: flex-start;
+  transform: rotate(-5deg);
+  max-width: min(42vw, 240px);
+}
+
+.intro-note-yis .intro-note-text {
+  white-space: normal;
+  line-height: 1.15;
+}
+
+.intro-note-honors {
+  top: 34%;
+  right: clamp(6%, 10vw, 14%);
+  transform: rotate(4deg);
+  max-width: min(40vw, 220px);
+  color: var(--pen-blue);
+}
+
+.intro-note-honors .intro-note-text {
+  white-space: normal;
+  line-height: 1.15;
+  color: rgba(58, 95, 138, 0.72);
+  text-align: right;
+}
+
+.intro-note-gpa {
+  top: clamp(14%, 18vh, 22%);
+  left: 58%;
+  transform: rotate(5deg);
+  color: var(--pen-blue);
+}
+
+.intro-note-gpa .intro-note-text {
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  color: rgba(58, 95, 138, 0.68);
+}
+
+.intro-note-journey {
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
   color: var(--pen-green);
+}
+
+.intro-note-journey .intro-note-text {
+  color: rgba(63, 107, 85, 0.78);
+  white-space: normal;
+  text-align: center;
+  max-width: min(70vw, 340px);
+  line-height: 1.2;
 }
 
 /* ---------- Polaroids ---------- */
@@ -230,13 +296,13 @@
 .intro-polaroid {
   position: absolute;
   margin: 0;
-  width: clamp(110px, 16vw, 168px);
-  padding: 0.55rem 0.55rem 0.35rem;
+  width: clamp(96px, 13vw, 132px);
+  padding: 0.45rem 0.45rem 0.3rem;
   background: #faf7f1;
-  border: 1.5px solid rgba(43, 36, 28, 0.35);
+  border: 1.5px solid rgba(43, 36, 28, 0.3);
   box-shadow:
-    2px 3px 0 rgba(43, 36, 28, 0.08),
-    0 10px 24px rgba(43, 36, 28, 0.08);
+    2px 3px 0 rgba(43, 36, 28, 0.06),
+    0 8px 18px rgba(43, 36, 28, 0.06);
   transform-origin: center;
   will-change: transform, opacity;
 }
@@ -249,51 +315,175 @@
 }
 
 .intro-polaroid figcaption {
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   font-family: 'Caveat', cursive;
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
   text-align: center;
-  color: rgba(43, 36, 28, 0.7);
+  color: rgba(43, 36, 28, 0.65);
 }
 
 .intro-polaroid-left {
-  top: 11%;
-  left: clamp(4%, 8vw, 12%);
-  transform: rotate(-6deg);
+  bottom: 10%;
+  left: clamp(4%, 7vw, 10%);
+  transform: rotate(-7deg);
 }
 
 .intro-polaroid-right {
-  top: 14%;
-  right: clamp(4%, 7vw, 11%);
-  transform: rotate(5deg);
-}
-
-.intro-polaroid-bottom {
-  bottom: 8%;
-  left: 50%;
-  transform: translateX(-50%) rotate(-2deg);
+  bottom: 12%;
+  right: clamp(5%, 8vw, 11%);
+  transform: rotate(6deg);
 }
 
 @media (max-width: 720px) {
-  .intro-polaroid-left {
-    top: 7%;
-    left: 3%;
-    width: 96px;
-  }
-
+  .intro-polaroid-left,
   .intro-polaroid-right {
-    top: 8%;
-    right: 3%;
+    width: 88px;
+  }
+
+  .intro-note-honors,
+  .intro-note-debater {
+    display: none;
+  }
+
+  .intro-note-gpa {
+    top: 16%;
+    left: 52%;
+  }
+
+  .intro-doodle-python {
+    top: 60%;
+  }
+
+  .intro-transition-plane {
+    top: 9%;
+    right: 1%;
     width: 96px;
   }
+}
 
-  .intro-polaroid-bottom {
-    bottom: 5%;
-    width: 104px;
-  }
+/* ---------- Start Journey CTA ---------- */
 
-  .intro-doodle-arrow,
-  .intro-doodle-squiggle {
-    opacity: 0.7;
-  }
+.intro-start-button {
+  position: absolute;
+  z-index: 6;
+  bottom: clamp(5%, 8vh, 10%);
+  left: 50%;
+  margin: 0;
+  padding: 0.7rem 1.55rem 0.55rem;
+  border: 1.8px solid rgba(43, 36, 28, 0.55);
+  border-radius: 2px;
+  background:
+    linear-gradient(180deg, #fffdf8 0%, #f3ebe0 100%);
+  box-shadow:
+    3px 3px 0 rgba(43, 36, 28, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  color: var(--ink, #2b241c);
+  font-family: 'Caveat', cursive;
+  font-size: clamp(1.25rem, 2.8vw, 1.65rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    box-shadow 0.12s ease,
+    background 0.12s ease,
+    filter 0.12s ease;
+}
+
+.intro-start-button:hover:not(:disabled) {
+  box-shadow:
+    4px 4px 0 rgba(43, 36, 28, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  filter: brightness(1.02);
+}
+
+.intro-start-button:disabled {
+  cursor: default;
+}
+
+.intro-start-button.is-pressed,
+.intro-start-button:active:not(:disabled) {
+  box-shadow:
+    1px 1px 0 rgba(43, 36, 28, 0.16),
+    0 2px 4px rgba(43, 36, 28, 0.08) inset;
+  background: linear-gradient(180deg, #efe6d8 0%, #e7ddd0 100%);
+  filter: brightness(0.97);
+}
+
+/* ---------- Intro → Space handoff ---------- */
+
+.intro-space-handoff {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  overflow: hidden;
+  pointer-events: all;
+}
+
+.intro-handoff-ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.intro-handoff-smoke {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.intro-handoff-puff {
+  position: absolute;
+  border-radius: 48% 52% 45% 55%;
+  background: #0a0908;
+  will-change: transform, opacity;
+}
+
+.intro-handoff-puff--1 {
+  border-radius: 42% 58% 50% 50%;
+  transform: rotate(-8deg);
+}
+
+.intro-handoff-puff--2 {
+  border-radius: 55% 45% 58% 42%;
+  transform: rotate(6deg);
+}
+
+.intro-handoff-puff--3 {
+  border-radius: 50% 50% 40% 60%;
+  transform: rotate(-3deg);
+}
+
+.intro-handoff-veil {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 42vmax;
+  height: 42vmax;
+  margin-left: -21vmax;
+  margin-top: -21vmax;
+  border-radius: 46% 54% 48% 52%;
+  background: #0a0908;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.intro-handoff-plane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: clamp(220px, 34vw, 400px);
+  height: auto;
+  overflow: visible;
+  z-index: 3;
+  color: #1a1510;
+  will-change: transform, opacity;
 }

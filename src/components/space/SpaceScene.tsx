@@ -5,23 +5,17 @@ import Atmosphere from './Atmosphere';
 import MilkyWay from './MilkyWay';
 import Starfield from './Starfield';
 import ScrollAccelerationTicker from './ScrollAccelerationTicker';
+import SpaceVisionReveal from './SpaceVisionReveal';
 import {
   EARTH_AXIAL_TILT_X,
   EARTH_AXIAL_TILT_Z,
-  SUN_POSITION,
 } from './earthConfig';
 
 function SpaceScene() {
   return (
     <>
       <ScrollAccelerationTicker />
-
-      <ambientLight intensity={0.035} />
-      <directionalLight
-        position={SUN_POSITION.toArray()}
-        intensity={2.4}
-        color="#fff2dd"
-      />
+      <SpaceVisionReveal />
 
       <Starfield />
 

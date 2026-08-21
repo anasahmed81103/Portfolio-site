@@ -16,7 +16,11 @@ function ExperienceController({
 }: ExperienceControllerProps) {
   switch (stage) {
     case ExperienceStage.Intro:
-      return <IntroExperience />;
+      return (
+        <IntroExperience
+          onSpaceHandoff={() => onStageChange?.(ExperienceStage.Space)}
+        />
+      );
 
     case ExperienceStage.Space:
       return <SpaceExperience />;
