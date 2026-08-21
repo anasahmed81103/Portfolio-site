@@ -156,7 +156,8 @@ function IntroSpaceHandoff({ onComplete }: IntroSpaceHandoffProps) {
       );
 
       tl.to(plane, { opacity: 0, duration: 0.2 }, planeDuration - 0.12);
-      tl.to({}, { duration: 0.2 });
+      // Settle on full black before swapping stages — avoids a hard cut.
+      tl.to({}, { duration: 0.65 });
     }, root);
 
     return () => ctx.revert();

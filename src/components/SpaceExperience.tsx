@@ -21,28 +21,54 @@ function SpaceExperience() {
     const ctx = gsap.context(() => {
       gsap.set(veil, { opacity: 1 });
       gsap.set(core, { opacity: 1 });
-      gsap.set(soft, { opacity: 0.95 });
+      gsap.set(soft, { opacity: 1 });
 
-      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+      const tl = gsap.timeline({ defaults: { ease: 'sine.inOut' } });
 
-      // Solid night lifts → stars bloom in clear darkness.
+      // Phase 1 — peel solid black just enough for stars to shimmer underneath.
+      tl.to(
+        core,
+        {
+          opacity: 0.55,
+          duration: 1.1,
+          ease: 'power1.out',
+        },
+        0.05,
+      );
+
+      // Soft veil opens a dark window so twinkling reads on black.
+      tl.to(
+        soft,
+        {
+          opacity: 0.75,
+          duration: 1.2,
+          ease: 'power1.out',
+        },
+        0.15,
+      );
+
+      // Hold — stars breathe in the dark before the full reveal.
+      tl.to({}, { duration: 0.55 });
+
+      // Phase 2 — slow vision clear; stars already alive.
       tl.to(
         core,
         {
           opacity: 0,
-          duration: 1.35,
+          duration: 2.4,
+          ease: 'power1.inOut',
         },
-        0.1,
+        '>-0.05',
       );
 
-      // Soft vignette clears slower — like eyes adjusting, Earth still dark under lights.
       tl.to(
         soft,
         {
           opacity: 0,
-          duration: 1.8,
+          duration: 2.8,
+          ease: 'power1.inOut',
         },
-        0.45,
+        '<0.25',
       );
 
       tl.set(veil, { display: 'none' });
@@ -81,7 +107,6 @@ function SpaceExperience() {
         <SpaceScene />
       </Canvas>
 
-      {/* Full black → clear: stars appear first while Earth is still unlit */}
       <div ref={veilRef} className="space-vision-veil" aria-hidden="true">
         <div className="space-vision-veil-core" />
         <div className="space-vision-veil-soft" />

@@ -4,8 +4,8 @@ import type { AmbientLight, DirectionalLight } from 'three';
 import { SUN_POSITION } from './earthConfig';
 
 /**
- * Staged space entrance: stars are already in the black sky;
- * sunlight / ambient ease up so Earth appears as vision clears.
+ * Staged space entrance: stars shimmer in the dark first;
+ * sunlight / ambient ease up much later so Earth resolves gently.
  */
 function SpaceVisionReveal() {
   const ambientRef = useRef<AmbientLight>(null);
@@ -20,25 +20,27 @@ function SpaceVisionReveal() {
       gsap.set(ambient, { intensity: 0 });
       gsap.set(sun, { intensity: 0 });
 
-      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+      const tl = gsap.timeline({ defaults: { ease: 'sine.inOut' } });
 
-      // Let stars settle in the dark first, then Earth resolves into view.
+      // Earth waits until stars have already been shimmering awhile.
       tl.to(
         ambient,
         {
           intensity: 0.035,
-          duration: 1.7,
+          duration: 2.6,
+          ease: 'power1.inOut',
         },
-        0.85,
+        2.4,
       );
 
       tl.to(
         sun,
         {
           intensity: 2.4,
-          duration: 2.0,
+          duration: 3.0,
+          ease: 'power1.inOut',
         },
-        1.0,
+        2.65,
       );
     });
 

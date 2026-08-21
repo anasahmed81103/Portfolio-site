@@ -31,16 +31,18 @@
   background: #000;
 }
 
+/* Dark window — stars can shimmer through the center before full clear */
 .space-vision-veil-soft {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse 55% 50% at 50% 48%,
+    ellipse 48% 42% at 50% 48%,
     transparent 0%,
-    rgba(0, 0, 0, 0.55) 42%,
-    #000 78%
+    transparent 18%,
+    rgba(0, 0, 0, 0.35) 38%,
+    rgba(0, 0, 0, 0.75) 62%,
+    #000 88%
   );
-  opacity: 0.9;
 }
 
 /* Full-viewport container for the Earth Dive Canvas */
