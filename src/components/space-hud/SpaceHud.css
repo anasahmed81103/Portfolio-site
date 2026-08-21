@@ -50,6 +50,25 @@
   animation: none;
 }
 
+/* Hero-spin nudge — bottom-right, only while Earth is still spinning */
+.space-scroll-hint--corner {
+  top: auto;
+  left: auto;
+  bottom: 1.4rem;
+  right: 1.1rem;
+  align-items: flex-end;
+  text-align: right;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+  transition: opacity 0.55s ease;
+}
+
+.space-scroll-hint--corner.is-on {
+  opacity: 1;
+  animation: space-hud-blink 1.55s ease-in-out infinite;
+}
+
 .space-progress-button {
   --matrix-green: #3dff6a;
   --matrix-green-dim: #1a8f3c;

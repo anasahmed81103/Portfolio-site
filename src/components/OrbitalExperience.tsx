@@ -11,6 +11,7 @@ import { ExperienceStage } from '../app/experience';
 import OrbitalScene from './space/OrbitalScene';
 import SpaceScrollHint from './space-hud/SpaceScrollHint';
 import SpaceProgressButton from './space-hud/SpaceProgressButton';
+import EarthSpinHint from './space-hud/EarthSpinHint';
 import {
   scrollIntensityRef,
   scrollTargetRef,
@@ -259,6 +260,7 @@ function OrbitalExperience({
         label={isDive ? 'scroll down' : 'scroll'}
         showArrow={isDive}
       />
+      {isDive ? <EarthSpinHint /> : null}
       {!isDive && onProgressToDive ? (
         <SpaceProgressButton onProgress={handleProgress} exiting={exiting} />
       ) : null}
