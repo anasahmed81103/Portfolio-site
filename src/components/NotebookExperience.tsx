@@ -146,7 +146,12 @@ function NotebookExperience() {
       );
     }, root);
 
-    return () => ctx.revert();
+    // Strict Mode remounts once in dev. Reset the flag so the reveal can
+    // run again; otherwise the white veil stays opaque forever.
+    return () => {
+      ctx.revert();
+      entranceDoneRef.current = false;
+    };
   }, []);
 
   // Page-turn enter when pageId changes (not on first reveal)

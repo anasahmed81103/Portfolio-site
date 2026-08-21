@@ -26,6 +26,8 @@
   z-index: 20;
   pointer-events: none;
   background: #eef6ff;
+  /* Hidden until the entrance timeline sets opacity — avoids a stuck white screen */
+  opacity: 0;
 }
 
 .np-stage {
