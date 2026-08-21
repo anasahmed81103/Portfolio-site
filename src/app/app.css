@@ -30,6 +30,16 @@
   height: 100%;
 }
 
+/* Full-viewport container for the Intro notebook scene */
+.intro-experience {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #2a241c;
+}
+
 /* Temporary stage jump nav — stays visible over full-viewport scenes */
 nav {
   position: fixed;

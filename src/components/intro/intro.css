@@ -1,0 +1,299 @@
+/* Scene root — ink tokens live here for all intro layers. */
+.intro-scene {
+  position: absolute;
+  inset: 0;
+  --line-gap: 2rem;
+  --margin-inset: clamp(3.5rem, 12vw, 7rem);
+  --line-offset: 3.25rem;
+  --ink: #2b241c;
+  --pen-blue: #3a5f8a;
+  --pen-red: #b4534b;
+  --pen-green: #3f6b55;
+}
+
+/* Cream notebook page with ruled writing lines. */
+.intro-page {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #f4efe6;
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(210, 195, 170, 0.35), transparent 50%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--line-gap) - 1px),
+      #b8c4d4 calc(var(--line-gap) - 1px),
+      #b8c4d4 var(--line-gap)
+    );
+  background-size: auto, auto, 100% var(--line-gap);
+  background-position: 0 0, 0 0, 0 var(--line-offset);
+}
+
+.intro-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--margin-inset);
+  width: 1.5px;
+  background: rgba(196, 82, 72, 0.55);
+  pointer-events: none;
+}
+
+.intro-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 80px rgba(160, 140, 110, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ---------- Signature ---------- */
+
+.intro-signature-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 1.5rem;
+  pointer-events: none;
+}
+
+.intro-signature {
+  width: min(94vw, 920px);
+  height: auto;
+  overflow: visible;
+  transform: rotate(-2.5deg);
+}
+
+.intro-signature-fill {
+  fill: var(--ink);
+  stroke: none;
+  opacity: 0;
+}
+
+.intro-signature-draw {
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  /* Hidden until GSAP sets the real path length — prevents a full-letter flash */
+  stroke-dasharray: 4000;
+  stroke-dashoffset: 4000;
+}
+
+.intro-signature-letter {
+  stroke-width: 2.6;
+}
+
+.intro-signature-sketch-pass {
+  transform: translate(0.9px, 0.7px);
+}
+
+.intro-signature-sketch {
+  stroke: rgba(43, 36, 28, 0.22);
+  stroke-width: 1.15;
+}
+
+.intro-signature-underline {
+  stroke-width: 2.2;
+}
+
+.intro-signature-flourish {
+  stroke-width: 1.8;
+}
+
+.intro-signature-caption {
+  margin: 0;
+  font-family: 'Caveat', cursive;
+  font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+  color: rgba(43, 36, 28, 0.55);
+  letter-spacing: 0.02em;
+  transform: rotate(-2deg);
+}
+
+/* ---------- Doodles ---------- */
+
+.intro-doodles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.intro-doodle {
+  position: absolute;
+  color: var(--ink);
+  overflow: visible;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.intro-doodle-star {
+  top: 9%;
+  left: 18%;
+  width: clamp(34px, 5vw, 52px);
+  color: var(--pen-blue);
+}
+
+.intro-doodle-star-sm {
+  top: 16%;
+  right: 16%;
+  width: clamp(22px, 3.5vw, 34px);
+  color: var(--pen-red);
+}
+
+.intro-doodle-rocket {
+  top: 22%;
+  left: 7%;
+  width: clamp(48px, 7vw, 72px);
+  color: var(--pen-blue);
+}
+
+.intro-doodle-planet {
+  top: 12%;
+  right: 8%;
+  width: clamp(64px, 9vw, 96px);
+  color: var(--pen-green);
+}
+
+.intro-doodle-coffee {
+  bottom: 18%;
+  left: 10%;
+  width: clamp(44px, 6.5vw, 68px);
+  color: var(--ink);
+}
+
+.intro-doodle-code {
+  top: 38%;
+  right: 6%;
+  width: clamp(52px, 7.5vw, 78px);
+  color: var(--pen-blue);
+}
+
+.intro-doodle-plane {
+  bottom: 28%;
+  right: 14%;
+  width: clamp(70px, 10vw, 100px);
+  color: var(--ink);
+}
+
+.intro-doodle-heart {
+  top: 48%;
+  left: 5%;
+  width: clamp(32px, 4.5vw, 46px);
+  color: var(--pen-red);
+}
+
+.intro-doodle-arrow {
+  top: 30%;
+  left: 28%;
+  width: clamp(70px, 10vw, 110px);
+  color: var(--pen-red);
+}
+
+.intro-doodle-squiggle {
+  bottom: 14%;
+  right: 28%;
+  width: clamp(80px, 12vw, 130px);
+  color: var(--pen-blue);
+}
+
+.intro-doodle-bulb {
+  bottom: 12%;
+  left: 28%;
+  width: clamp(36px, 5vw, 52px);
+  color: #b8860b;
+}
+
+.intro-doodle-smiley {
+  top: 58%;
+  right: 9%;
+  width: clamp(40px, 6vw, 58px);
+  color: var(--pen-green);
+}
+
+/* ---------- Polaroids ---------- */
+
+.intro-polaroids {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.intro-polaroid {
+  position: absolute;
+  margin: 0;
+  width: clamp(110px, 16vw, 168px);
+  padding: 0.55rem 0.55rem 0.35rem;
+  background: #faf7f1;
+  border: 1.5px solid rgba(43, 36, 28, 0.35);
+  box-shadow:
+    2px 3px 0 rgba(43, 36, 28, 0.08),
+    0 10px 24px rgba(43, 36, 28, 0.08);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.intro-polaroid-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--ink);
+}
+
+.intro-polaroid figcaption {
+  margin-top: 0.35rem;
+  font-family: 'Caveat', cursive;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  text-align: center;
+  color: rgba(43, 36, 28, 0.7);
+}
+
+.intro-polaroid-left {
+  top: 11%;
+  left: clamp(4%, 8vw, 12%);
+  transform: rotate(-6deg);
+}
+
+.intro-polaroid-right {
+  top: 14%;
+  right: clamp(4%, 7vw, 11%);
+  transform: rotate(5deg);
+}
+
+.intro-polaroid-bottom {
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+@media (max-width: 720px) {
+  .intro-polaroid-left {
+    top: 7%;
+    left: 3%;
+    width: 96px;
+  }
+
+  .intro-polaroid-right {
+    top: 8%;
+    right: 3%;
+    width: 96px;
+  }
+
+  .intro-polaroid-bottom {
+    bottom: 5%;
+    width: 104px;
+  }
+
+  .intro-doodle-arrow,
+  .intro-doodle-squiggle {
+    opacity: 0.7;
+  }
+}
