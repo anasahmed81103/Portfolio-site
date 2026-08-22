@@ -13,7 +13,6 @@ import {
 } from './notebook/newspaperData';
 import PageNavigation from './notebook/PageNavigation';
 import FrontPage from './notebook/pages/FrontPage';
-import AboutPage from './notebook/pages/AboutPage';
 import ExperiencePage from './notebook/pages/ExperiencePage';
 import ProjectsPage from './notebook/pages/ProjectsPage';
 import EducationSkillsPage from './notebook/pages/EducationSkillsPage';
@@ -22,7 +21,6 @@ import './notebook/newspaper.css';
 
 const PAGE_COMPONENTS: Record<NewspaperPageId, () => JSX.Element> = {
   front: FrontPage,
-  about: AboutPage,
   experience: ExperiencePage,
   projects: ProjectsPage,
   education: EducationSkillsPage,

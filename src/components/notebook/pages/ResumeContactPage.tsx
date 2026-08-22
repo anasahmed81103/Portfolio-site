@@ -2,38 +2,50 @@ import NewspaperPage from '../NewspaperPage';
 import NewspaperHeader from '../NewspaperHeader';
 import Article from '../Article';
 import HandAnnotation from '../HandAnnotation';
+import { CHRONICLE_NAME, PROFILE } from '../newspaperData';
 
-/** PAGE 6 — Closing edition: resume + contact. */
+/** PAGE 5 — Closing edition: résumé + correspondence. */
 function ResumeContactPage() {
   return (
-    <NewspaperPage className="np-closing" folio="Page 6 — Final Edition">
-      <NewspaperHeader variant="interior" sectionTitle="Final Edition" />
+    <NewspaperPage className="np-closing" folio="Page 5 — Resume & Contact">
+      <NewspaperHeader variant="interior" sectionTitle="Resume & Contact" />
 
       <div className="np-closing-hero">
         <h2 className="np-display-headline np-display-headline-sm">
-          The record & the letterbox
+          Get in touch
         </h2>
         <p className="np-display-sub">
-          Resume access, correspondence, and a last line in the margin.
+          The résumé, plus email, GitHub, and LinkedIn.
         </p>
       </div>
 
       <div className="np-closing-grid">
         <Article
           className="np-closing-resume"
-          headline="The formal record"
-          dek="Download or view the résumé when the final PDF is linked."
-          byline="Résumé desk"
+          dropCap
+          headline="Résumé"
+          dek="The same facts as this paper, set for a hiring desk."
+          byline="Karachi"
         >
           <p>
-            Placeholder for resume actions. A printed-style button will open the
-            PDF or a printable page once the file is ready.
+            {PROFILE.fullName}, {PROFILE.title}, {PROFILE.location}. The
+            preceding pages are the illustrated edition; the PDF is the same
+            record, ready to download.
           </p>
           <p className="np-closing-actions">
-            <a className="np-print-btn" href="#resume">
+            <a
+              className="np-print-btn"
+              href={PROFILE.resumeHref}
+              target="_blank"
+              rel="noreferrer"
+            >
               View résumé
             </a>
-            <a className="np-print-btn np-print-btn-ghost" href="#resume-pdf">
+            <a
+              className="np-print-btn np-print-btn-ghost"
+              href={PROFILE.resumeHref}
+              download={PROFILE.resumeDownloadName}
+            >
               Download PDF
             </a>
           </p>
@@ -41,25 +53,25 @@ function ResumeContactPage() {
 
         <Article
           className="np-closing-contact"
-          headline="Write to the editor"
-          dek="Correspondence welcomed — especially the thoughtful kind."
-          byline="Contact desk"
+          headline="Correspondence"
+          dek="Email, GitHub, and LinkedIn."
+          byline="Karachi"
         >
           <ul className="np-contact-list">
             <li>
               <span className="np-contact-label">Email</span>
-              <a href="mailto:hello@example.com">hello@example.com</a>
+              <a href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
             </li>
             <li>
               <span className="np-contact-label">GitHub</span>
-              <a href="https://github.com/" target="_blank" rel="noreferrer">
-                github.com/your-handle
+              <a href={PROFILE.github} target="_blank" rel="noreferrer">
+                {PROFILE.githubLabel}
               </a>
             </li>
             <li>
               <span className="np-contact-label">LinkedIn</span>
-              <a href="https://linkedin.com/" target="_blank" rel="noreferrer">
-                linkedin.com/in/your-handle
+              <a href={PROFILE.linkedin} target="_blank" rel="noreferrer">
+                {PROFILE.linkedinLabel}
               </a>
             </li>
           </ul>
@@ -69,15 +81,15 @@ function ResumeContactPage() {
       <footer className="np-closing-footer">
         <div className="np-double-rule" aria-hidden="true" />
         <p className="np-closing-message">
-          Thank you for reading The Anas Ahmed Chronicle. The presses are never
-          fully quiet — another edition is always being set.
+          Thank you for reading {CHRONICLE_NAME}. The next edition is already
+          being set.
         </p>
         <HandAnnotation className="np-closing-note">
-          until the next sky →
+          glad you read this far →
         </HandAnnotation>
         <p className="np-closing-colophon">
-          End of Vol. I · Printed on imaginary presses · All rights reserved to
-          their author
+          End of Vol. I · Karachi Edition · Set in type for the screen · All
+          rights reserved to their author
         </p>
       </footer>
     </NewspaperPage>

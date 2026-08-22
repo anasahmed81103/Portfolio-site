@@ -267,10 +267,10 @@
 /* ---------- Header / masthead ---------- */
 
 .np-header-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem 0.75rem;
   font-family: 'Libre Baskerville', 'Times New Roman', serif;
   font-size: clamp(0.62rem, 1.4vw, 0.72rem);
   letter-spacing: 0.08em;
@@ -278,10 +278,22 @@
   color: var(--np-ink-faint);
 }
 
+.np-header-top > :first-child {
+  justify-self: start;
+}
+
+.np-header-top > :last-child {
+  justify-self: end;
+  text-align: right;
+}
+
 .np-header-name {
+  justify-self: center;
+  text-align: center;
   font-weight: 700;
   color: var(--np-ink-soft);
   letter-spacing: 0.12em;
+  white-space: nowrap;
 }
 
 .np-masthead-row {
@@ -580,6 +592,34 @@
   margin-bottom: 0;
 }
 
+.np-job-points {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.np-job-points li {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgba(26, 21, 16, 0.18);
+}
+
+.np-job-points li:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.np-job-points strong {
+  display: block;
+  margin-bottom: 0.18rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--np-ink);
+}
+
 .np-experience-lead {
   font-style: italic;
   color: var(--np-ink) !important;
@@ -726,6 +766,99 @@
   color: var(--np-ink-soft);
 }
 
+.np-notice-row {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1.15rem 0 0;
+}
+
+.np-classified {
+  border: 1.5px solid var(--np-ink);
+  padding: 0.85rem 0.95rem;
+  background: rgba(255, 252, 245, 0.4);
+  box-shadow: 1px 1px 0 rgba(26, 21, 16, 0.12);
+}
+
+.np-classified-kicker {
+  margin: 0 0 0.25rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--np-accent);
+}
+
+.np-classified-title {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.np-classified-meta {
+  margin: 0.25rem 0 0.45rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--np-ink-faint);
+}
+
+.np-classified p {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--np-ink-soft);
+}
+
+.np-stamp-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.np-stamp {
+  border: 1.5px dashed var(--np-ink);
+  padding: 0.75rem 0.85rem;
+  background:
+    repeating-linear-gradient(
+      -12deg,
+      transparent,
+      transparent 7px,
+      rgba(26, 21, 16, 0.03) 7px,
+      rgba(26, 21, 16, 0.03) 8px
+    ),
+    rgba(255, 252, 245, 0.55);
+}
+
+.np-stamp-house {
+  margin: 0 0 0.4rem;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--np-margin);
+  border-bottom: 1px solid rgba(26, 21, 16, 0.25);
+  padding-bottom: 0.3rem;
+}
+
+.np-stamp ul {
+  margin: 0;
+  padding-left: 1.05rem;
+}
+
+.np-stamp li {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--np-ink-soft);
+  margin-bottom: 0.28rem;
+}
+
+.np-stamp li:last-child {
+  margin-bottom: 0;
+}
+
 /* ---------- Closing ---------- */
 
 .np-closing-hero {
@@ -813,6 +946,11 @@
   color: var(--np-accent);
 }
 
+.np-closing-contact-note {
+  display: block;
+  margin-top: 0.65rem;
+}
+
 .np-closing-colophon {
   margin: 1rem 0 0;
   font-family: 'Libre Baskerville', 'Times New Roman', serif;
@@ -879,7 +1017,7 @@
   margin: 0;
   padding: 0.45rem 0 0;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.25rem;
   border-top: 1px solid rgba(26, 21, 16, 0.25);
 }
@@ -983,6 +1121,14 @@
   .np-closing-grid {
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+  }
+
+  .np-notice-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .np-stamp-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

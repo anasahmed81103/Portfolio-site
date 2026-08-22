@@ -1,25 +1,17 @@
 import { CHRONICLE_NAME, EDITION_META } from './newspaperData';
+import useNewspaperClock from './useNewspaperClock';
 
 type NewspaperHeaderProps = {
   /** Compact header for interior pages */
   variant?: 'masthead' | 'interior';
   sectionTitle?: string;
-  dateLabel?: string;
 };
 
 function NewspaperHeader({
   variant = 'masthead',
   sectionTitle,
-  dateLabel,
 }: NewspaperHeaderProps) {
-  const date =
-    dateLabel ??
-    new Intl.DateTimeFormat('en-GB', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }).format(new Date());
+  const clock = useNewspaperClock();
 
   if (variant === 'interior') {
     return (
@@ -27,7 +19,9 @@ function NewspaperHeader({
         <div className="np-header-top">
           <span>{EDITION_META.volume}</span>
           <span className="np-header-name">{CHRONICLE_NAME}</span>
-          <span>{date}</span>
+          <span>
+            {clock.date} · {clock.time}
+          </span>
         </div>
         {sectionTitle ? (
           <h1 className="np-section-banner">{sectionTitle}</h1>
@@ -67,9 +61,11 @@ function NewspaperHeader({
         </div>
 
         <div className="np-masthead-center">
-          <p className="np-masthead-kicker">Personal illustrated newspaper</p>
+          <p className="np-masthead-kicker">
+            Karachi · an illustrated paper of software and AI
+          </p>
           <h1 className="np-masthead-title">{CHRONICLE_NAME}</h1>
-          <p className="np-masthead-date">{date}</p>
+          <p className="np-masthead-date">{clock.masthead}</p>
         </div>
 
         <div className="np-masthead-ornament" aria-hidden="true">

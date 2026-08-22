@@ -63,7 +63,7 @@ function MediaSlideshow({
                 ▣
               </span>
               <span className="np-photo-placeholder-label">
-                {slide.label ?? `Plate ${index + 1}`}
+                {slide.label ?? `Fig. ${index + 1}`}
               </span>
             </div>
           )}
