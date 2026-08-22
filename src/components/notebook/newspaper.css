@@ -20,6 +20,48 @@
   color: var(--np-ink);
 }
 
+.notebook-experience.np-fine-pointer,
+.notebook-experience.np-fine-pointer * {
+  cursor: none;
+}
+
+.np-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  color: var(--np-ink);
+  filter: drop-shadow(0 1px 1px rgba(255, 252, 245, 0.9));
+}
+
+.np-cursor svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  overflow: visible;
+}
+
+.np-cursor-lens {
+  transform: translate(-11px, -11px);
+}
+
+.np-cursor-pen {
+  transform: translate(-30px, -30px);
+}
+
+.np-cursor[data-mode='read'] .np-cursor-lens {
+  display: block;
+}
+
+.np-cursor[data-mode='write'] .np-cursor-pen {
+  display: block;
+}
+
 .notebook-flash-veil {
   position: absolute;
   inset: 0;
@@ -363,9 +405,11 @@
 }
 
 .np-photo-frame {
+  position: relative;
+  isolation: isolate;
   border: 1.5px solid var(--np-ink);
   padding: 0.35rem;
-  background: rgba(255, 252, 245, 0.45);
+  background: var(--np-paper);
   box-shadow: 1px 1px 0 rgba(26, 21, 16, 0.15);
 }
 
@@ -374,7 +418,19 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: contrast(1.05) grayscale(0.15) sepia(0.12);
+  /* Ink-on-cream print: greyscale, then multiply into the paper. */
+  filter: grayscale(1) contrast(1.22) brightness(1.08);
+  mix-blend-mode: multiply;
+}
+
+.np-photo-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0.35rem;
+  pointer-events: none;
+  background: var(--np-paper);
+  mix-blend-mode: color;
+  opacity: 0.42;
 }
 
 .np-photo-placeholder {
@@ -509,8 +565,16 @@
 
 .np-front-note {
   position: absolute;
-  left: -0.25rem;
-  bottom: 2.5rem;
+  right: -0.15rem;
+  top: 0.85rem;
+  left: auto;
+  bottom: auto;
+  z-index: 2;
+  max-width: 8.5rem;
+  margin: 0;
+  padding: 0.12rem 0.4rem;
+  background: color-mix(in srgb, var(--np-paper) 92%, transparent);
+  transform: rotate(6deg);
 }
 
 .np-teasers-label {

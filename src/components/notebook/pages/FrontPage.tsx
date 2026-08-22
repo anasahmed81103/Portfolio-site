@@ -4,22 +4,29 @@ import Article from '../Article';
 import MediaSlideshow from '../MediaSlideshow';
 import HandAnnotation from '../HandAnnotation';
 import { PROFILE } from '../newspaperData';
+import { notebookPhotos, STAND_IN_CREDIT } from '../notebookPhotos';
 
 const FRONT_PLATES = [
   {
-    alt: 'Working portrait of Anas Ahmed at the desk',
+    src: notebookPhotos.deskCode,
+    alt: 'A workstation with code on screen — stand-in photograph',
     label: 'Fig. I · Desk',
     caption: 'The working portrait — where enterprise systems and models share a desk.',
+    credit: STAND_IN_CREDIT,
   },
   {
-    alt: 'Transformer Health Indexing portal recognizing equipment',
+    src: notebookPhotos.transformer,
+    alt: 'Electrical equipment photographed as a stand-in for industrial vision work',
     label: 'Fig. II · THI-Portal',
     caption: 'THI-Portal — industrial vision, identifying a transformer in real time.',
+    credit: STAND_IN_CREDIT,
   },
   {
-    alt: 'Interface still from an AI engineering build',
+    src: notebookPhotos.codeScreen,
+    alt: 'Close-up of programming on a screen — stand-in photograph',
     label: 'Fig. III · Motion',
     caption: 'A still from the work: code, inference, and the interface between them.',
+    credit: STAND_IN_CREDIT,
   },
 ] as const;
 

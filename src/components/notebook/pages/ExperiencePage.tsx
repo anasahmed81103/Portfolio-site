@@ -3,6 +3,7 @@ import NewspaperHeader from '../NewspaperHeader';
 import Article from '../Article';
 import NewspaperPhoto from '../NewspaperPhoto';
 import HandAnnotation from '../HandAnnotation';
+import { notebookPhotos, STAND_IN_CREDIT } from '../notebookPhotos';
 
 const ROLES = [
   {
@@ -116,11 +117,11 @@ function ExperiencePage() {
 
         <aside className="np-experience-rail">
           <NewspaperPhoto
-            alt="The working desk"
+            src={notebookPhotos.officeDesk}
+            alt="An office desk — stand-in workplace photograph"
             aspect="square"
             caption="Wherever the build happens — Karachi, remote, or the FAST lab."
-            credit="File photo"
-            placeholderLabel="The Desk"
+            credit={STAND_IN_CREDIT}
           />
           <HandAnnotation>four posts. one record.</HandAnnotation>
           <div className="np-sidebar-box">

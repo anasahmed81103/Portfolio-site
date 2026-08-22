@@ -3,6 +3,7 @@ import NewspaperHeader from '../NewspaperHeader';
 import Article from '../Article';
 import NewspaperPhoto from '../NewspaperPhoto';
 import HandAnnotation from '../HandAnnotation';
+import { notebookPhotos, STAND_IN_CREDIT } from '../notebookPhotos';
 
 const CERTIFICATIONS = [
   {
@@ -118,11 +119,11 @@ function EducationSkillsPage() {
 
         <aside className="np-education-aside">
           <NewspaperPhoto
-            alt="FAST-NUCES campus photograph"
+            src={notebookPhotos.campus}
+            alt="A university campus — stand-in plate, not FAST-NUCES specifically"
             aspect="portrait"
             caption="FAST-NUCES — four years, in one photograph."
-            credit="Campus file"
-            placeholderLabel="FAST-NUCES"
+            credit={STAND_IN_CREDIT}
           />
           <HandAnnotation>seven times on the list</HandAnnotation>
         </aside>

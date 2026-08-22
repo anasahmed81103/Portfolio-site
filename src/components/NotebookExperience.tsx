@@ -12,6 +12,7 @@ import {
   type NewspaperPageId,
 } from './notebook/newspaperData';
 import PageNavigation from './notebook/PageNavigation';
+import NewspaperCursor from './notebook/NewspaperCursor';
 import FrontPage from './notebook/pages/FrontPage';
 import ExperiencePage from './notebook/pages/ExperiencePage';
 import ProjectsPage from './notebook/pages/ProjectsPage';
@@ -199,6 +200,7 @@ function NotebookExperience() {
       </div>
 
       <div ref={veilRef} className="notebook-flash-veil" aria-hidden="true" />
+      <NewspaperCursor rootRef={rootRef} />
     </div>
   );
 }

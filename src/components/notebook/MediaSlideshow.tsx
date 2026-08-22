@@ -4,6 +4,7 @@ export type SlideshowSlide = {
   src?: string;
   alt: string;
   caption?: string;
+  credit?: string;
   label?: string;
 };
 
@@ -68,12 +69,14 @@ function MediaSlideshow({
             </div>
           )}
         </div>
-        {(slide.caption || count > 1) && (
+        {(slide.caption || slide.credit || count > 1) && (
           <div className="np-photo-caption np-slideshow-caption">
             <span>{slide.caption ?? slide.alt}</span>
-            {count > 1 ? (
+            {slide.credit || count > 1 ? (
               <span className="np-photo-credit">
-                {index + 1} / {count}
+                {[slide.credit, count > 1 ? `${index + 1} / ${count}` : null]
+                  .filter(Boolean)
+                  .join(' · ')}
               </span>
             ) : null}
           </div>

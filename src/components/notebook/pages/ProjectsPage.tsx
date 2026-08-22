@@ -4,22 +4,29 @@ import Article from '../Article';
 import MediaSlideshow from '../MediaSlideshow';
 import NewspaperPhoto from '../NewspaperPhoto';
 import HandAnnotation from '../HandAnnotation';
+import { notebookPhotos, STAND_IN_CREDIT } from '../notebookPhotos';
 
 const THI_PLATES = [
   {
-    alt: 'Transformer Health Indexing portal recognizing equipment',
+    src: notebookPhotos.transformer,
+    alt: 'Electrical equipment — stand-in for the Transformer Health Indexing System',
     label: 'Fig. A1',
     caption: 'THI-Portal — the interface that reads a transformer as it stands.',
+    credit: STAND_IN_CREDIT,
   },
   {
-    alt: 'Computer vision pipeline still from the K-Electric project',
+    src: notebookPhotos.powerLines,
+    alt: 'High-voltage transmission lines — stand-in field plate',
     label: 'Fig. A2',
     caption: 'YOLOv8 in the field — detection without the bias of a clipboard.',
+    credit: STAND_IN_CREDIT,
   },
   {
-    alt: 'Model evaluation still balancing latency and accuracy',
+    src: notebookPhotos.dataCharts,
+    alt: 'Charts used as a stand-in for model evaluation',
     label: 'Fig. A3',
     caption: 'Weights, latency, mAP — the triangle every industrial model must survive.',
+    credit: STAND_IN_CREDIT,
   },
 ] as const;
 
@@ -81,11 +88,11 @@ function ProjectsPage() {
       <div className="np-project-grid">
         <article className="np-project-card">
           <NewspaperPhoto
-            alt="Aerial-to-ground panorama synthesis still"
+            src={notebookPhotos.aerialCity}
+            alt="Aerial photograph of a city — stand-in for CrossViewNet"
             aspect="landscape"
             caption="From overhead maps, a ground-level world — 360° panoramas generated from aerial imagery."
-            credit="Fig. B"
-            placeholderLabel="CrossViewNet"
+            credit={`${STAND_IN_CREDIT} · Fig. B`}
           />
           <p className="np-kicker">Research revival · CVPR lineage</p>
           <h3 className="np-headline">CrossViewNet: Aerial to Ground Scene Synthesis</h3>
@@ -106,11 +113,11 @@ function ProjectsPage() {
 
         <article className="np-project-card">
           <NewspaperPhoto
-            alt="Gaze detection system processing facial landmarks"
+            src={notebookPhotos.gazeEye}
+            alt="Close photograph of an eye — stand-in for gaze detection"
             aspect="landscape"
             caption="Attention, measured — twenty-five frames a second, no GPU required."
-            credit="Fig. C"
-            placeholderLabel="Gaze Detection"
+            credit={`${STAND_IN_CREDIT} · Fig. C`}
           />
           <p className="np-kicker">On-device intelligence</p>
           <h3 className="np-headline">Gaze Detection AI System</h3>
@@ -130,11 +137,11 @@ function ProjectsPage() {
         <article className="np-project-card np-project-card-wide">
           <div className="np-project-inline">
             <NewspaperPhoto
-              alt="AirWizz flight booking system interface"
+              src={notebookPhotos.airplane}
+              alt="Aircraft in flight — stand-in for the AirWizz booking system"
               aspect="square"
               caption="Tickets, currency, and a payment rail — all in one engine."
-              credit="Fig. D"
-              placeholderLabel="AirWizz"
+              credit={`${STAND_IN_CREDIT} · Fig. D`}
             />
             <div>
               <p className="np-kicker">Enterprise brief</p>
