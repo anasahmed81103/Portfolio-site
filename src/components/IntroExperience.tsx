@@ -3,6 +3,7 @@ import IntroScene from './intro/IntroScene';
 import IntroStartButton from './intro/IntroStartButton';
 import IntroSpaceHandoff from './intro/IntroSpaceHandoff';
 import IntroCursor from './intro/IntroCursor';
+import IntroInkTrail from './intro/IntroInkTrail';
 
 type IntroExperienceProps = {
   onSpaceHandoff?: () => void;
@@ -43,6 +44,7 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   return (
     <div ref={rootRef} className="intro-experience">
       <IntroScene startButton={startButton} />
+      <IntroInkTrail rootRef={rootRef} active={!handingOff} />
       {handingOff ? (
         <IntroSpaceHandoff onComplete={handleHandoffComplete} />
       ) : null}

@@ -527,3 +527,14 @@
 .intro-cursor[data-mode='ink'] .intro-cursor-ink {
   display: block;
 }
+
+/* Ephemeral ink scribbles — sits above the page, below buttons / handoff */
+.intro-ink-trail {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  touch-action: none;
+}
