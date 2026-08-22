@@ -18,6 +18,7 @@ import ExperiencePage from './notebook/pages/ExperiencePage';
 import ProjectsPage from './notebook/pages/ProjectsPage';
 import EducationSkillsPage from './notebook/pages/EducationSkillsPage';
 import ResumeContactPage from './notebook/pages/ResumeContactPage';
+import { playTransition, playTransitionOnce } from '../audio/stageAudio';
 import './notebook/newspaper.css';
 
 const PAGE_COMPONENTS: Record<NewspaperPageId, () => JSX.Element> = {
@@ -60,6 +61,13 @@ function NotebookExperience() {
 
       turnDirectionRef.current = nextIndex > pageIndex ? 1 : -1;
       turningRef.current = true;
+      playTransition('pageFlip', {
+        volume: 0.6,
+        fadeIn: 0,
+        fadeOut: 0.25,
+        maxDuration: 1.1,
+        playbackRate: 1.35,
+      });
 
       gsap.to(sheet, {
         x: turnDirectionRef.current * -42,
@@ -114,6 +122,15 @@ function NotebookExperience() {
     if (!root || !veil || !sheet || entranceDoneRef.current) return;
     entranceDoneRef.current = true;
     skipEntranceAnimRef.current = true;
+
+    // Covers dive→notebook flash and direct jumps into the chronicle.
+    playTransitionOnce('notebook-reveal', 'notebookReveal', {
+      volume: 0.28,
+      fadeIn: 0.35,
+      fadeOut: 1.5,
+      maxDuration: 6,
+      delay: 0.35,
+    });
 
     const inkBits = sheet.querySelectorAll(
       '.np-masthead-title, .np-display-headline, .np-photo, .np-article, .np-teaser, .np-header',

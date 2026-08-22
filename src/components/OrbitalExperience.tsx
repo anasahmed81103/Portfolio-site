@@ -14,6 +14,11 @@ import SpaceProgressButton from './space-hud/SpaceProgressButton';
 import EarthSpinHint from './space-hud/EarthSpinHint';
 import SpaceCursor from './space/SpaceCursor';
 import {
+  playLoop,
+  playTransitionOnce,
+  stopLoop,
+} from '../audio/stageAudio';
+import {
   scrollIntensityRef,
   scrollTargetRef,
 } from '../hooks/useScrollAcceleration.ts';
@@ -90,6 +95,14 @@ function OrbitalExperience({
   // Space entrance veil — only when starting in Space, not on dive-first mount.
   useLayoutEffect(() => {
     if (skipVisionReveal) return;
+
+    // Fallback when jumping straight to Space (intro handoff already played this).
+    playTransitionOnce('space-reveal', 'spaceReveal', {
+      volume: 0.7,
+      fadeIn: 0.3,
+      fadeOut: 1.8,
+      maxDuration: 5,
+    });
 
     const veil = veilRef.current;
     if (!veil) return;
@@ -236,6 +249,14 @@ function OrbitalExperience({
       scrollIntensityRef.current = 0;
     };
   }, [isDive]);
+
+  // Ambient space bed for Space + Earth Dive; fades out when leaving orbital.
+  useEffect(() => {
+    playLoop('space', 'space', { volume: 0.12, fadeIn: 1.1 });
+    return () => {
+      stopLoop('space', { fadeOut: 1.2 });
+    };
+  }, []);
 
   return (
     <div ref={containerRef} className="space-experience">

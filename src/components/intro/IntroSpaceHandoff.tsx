@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import IntroPlaneSvg from './IntroPlaneSvg';
+import { playLoop, playTransitionOnce } from '../../audio/stageAudio';
 
 type IntroSpaceHandoffProps = {
   onComplete: () => void;
@@ -30,6 +31,16 @@ function IntroSpaceHandoff({ onComplete }: IntroSpaceHandoffProps) {
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
+
+    // Space bed under the blackout; reveal leads the Space stage by ~1.5s.
+    playLoop('space', 'space', { volume: 0.1, fadeIn: 1.4 });
+    playTransitionOnce('space-reveal', 'spaceReveal', {
+      volume: 0.7,
+      fadeIn: 0.3,
+      fadeOut: 1.8,
+      maxDuration: 5,
+      delay: 3.2,
+    });
 
     const plane = root.querySelector<HTMLElement>('.intro-handoff-plane');
     const puffs = gsap.utils.toArray<HTMLElement>('.intro-handoff-puff', root);
