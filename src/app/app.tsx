@@ -13,6 +13,7 @@ import { useLayoutEffect, useState } from 'react';
 import { ExperienceStage } from './experience';
 import ExperienceController from '../components/ExperienceController';
 import RestartJourneyButton from '../components/RestartJourneyButton';
+import SiteWatermark from '../components/SiteWatermark';
 import {
   installAudioUnlock,
   resetAudioSession,
@@ -44,6 +45,8 @@ function App() {
           setCurrentStage(ExperienceStage.Intro);
         }}
       />
+
+      <SiteWatermark stage={currentStage} />
     </>
   );
 }

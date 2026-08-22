@@ -209,3 +209,40 @@
     2px 2px 0 rgba(26, 21, 16, 0.14),
     0 8px 18px rgba(0, 0, 0, 0.2);
 }
+
+/* Quiet copyright watermark — bottom center */
+.site-watermark {
+  position: fixed;
+  left: 50%;
+  bottom: 0.55rem;
+  z-index: 28;
+  margin: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+  font-size: clamp(0.62rem, 1.5vw, 0.72rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 1;
+}
+
+.site-watermark--intro {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(0.78rem, 1.7vw, 0.92rem);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #1a1510;
+}
+
+.site-watermark--space,
+.site-watermark--dive {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.site-watermark--notebook {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  color: #1a1510;
+}
