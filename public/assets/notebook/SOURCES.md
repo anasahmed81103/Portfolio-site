@@ -19,6 +19,9 @@ recorded here).
 | `gaze-eye.jpg` | Eye / gaze | [Pexels 887751](https://www.pexels.com/photo/887751/) |
 | `airplane.jpg` | Aircraft | [Pexels 46148](https://www.pexels.com/photo/46148/) |
 | `portrait.jpg` | Staff portrait of Anas Ahmed | GitHub public avatar (`anasahmed81103`) — replace with a higher-resolution original when ready |
+| `cross1.jpg` | CrossViewNet result strip (seg / GT / synth) | Original project plate |
+| `cross2.jpg` | CrossViewNet result strip (aerial / panorama / channels) | Original project plate |
 
-These are generic stand-ins, not photographs of Muhammad Anas Ahmed Shaikh
-or of FAST-NUCES / K-Electric specifically.
+Stand-in plates above are generic stock, not photographs of Muhammad Anas Ahmed
+Shaikh or of FAST-NUCES / K-Electric specifically. `cross1.jpg` and `cross2.jpg`
+are original CrossViewNet outputs.

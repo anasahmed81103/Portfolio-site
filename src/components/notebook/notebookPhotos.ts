@@ -14,6 +14,10 @@ export const notebookPhotos = {
   airplane: '/assets/notebook/airplane.jpg',
   campus: '/assets/notebook/campus.jpg',
   portrait: '/assets/notebook/portrait.jpg',
+  /** CrossViewNet result strips — original project plates */
+  cross1: '/assets/notebook/cross1.jpg',
+  cross2: '/assets/notebook/cross2.jpg',
 } as const;
 
 export const STAND_IN_CREDIT = 'Stand-in · Pexels';
+export const PROJECT_CREDIT = 'Project plate';

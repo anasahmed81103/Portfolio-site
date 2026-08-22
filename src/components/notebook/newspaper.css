@@ -473,6 +473,23 @@
   aspect-ratio: 16 / 10;
 }
 
+/* Ultra-wide project strips — keep full width, natural height */
+.np-photo-banner .np-photo-frame {
+  padding: 0.28rem;
+}
+
+.np-photo-banner .np-photo-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.np-photo-banner .np-photo-placeholder {
+  aspect-ratio: 6 / 1;
+}
+
 .np-photo-placeholder-mark {
   font-size: 1.4rem;
   opacity: 0.55;
@@ -753,6 +770,35 @@
 
 .np-projects-note {
   margin-top: 0.35rem;
+}
+
+/* CrossViewNet — full-bleed panoramic plates */
+.np-crossview {
+  margin: 0.15rem 0 0.35rem;
+}
+
+.np-crossview-head {
+  max-width: 46rem;
+  margin-bottom: 0.85rem;
+}
+
+.np-crossview-dek {
+  margin: 0.15rem 0 0;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.88rem, 1.6vw, 0.98rem);
+  line-height: 1.55;
+  color: var(--np-ink-soft);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.np-crossview-plates {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.np-crossview-plate .np-photo-caption {
+  font-size: 0.68rem;
 }
 
 /* ---------- Education / skills ---------- */

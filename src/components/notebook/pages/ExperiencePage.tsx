@@ -120,7 +120,7 @@ function ExperiencePage() {
             src={notebookPhotos.officeDesk}
             alt="An office desk — stand-in workplace photograph"
             aspect="square"
-            caption="Wherever the build happens — Karachi, remote, or the FAST lab."
+            caption="Wherever the build happens — Karachi, remote, or somewhere new."
             credit={STAND_IN_CREDIT}
           />
           <HandAnnotation>four posts. one record.</HandAnnotation>

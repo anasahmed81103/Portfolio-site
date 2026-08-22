@@ -4,7 +4,11 @@ import Article from '../Article';
 import MediaSlideshow from '../MediaSlideshow';
 import NewspaperPhoto from '../NewspaperPhoto';
 import HandAnnotation from '../HandAnnotation';
-import { notebookPhotos, STAND_IN_CREDIT } from '../notebookPhotos';
+import {
+  notebookPhotos,
+  PROJECT_CREDIT,
+  STAND_IN_CREDIT,
+} from '../notebookPhotos';
 
 const THI_PLATES = [
   {
@@ -85,32 +89,55 @@ function ProjectsPage() {
 
       <div className="np-double-rule" aria-hidden="true" />
 
-      <div className="np-project-grid">
-        <article className="np-project-card">
-          <NewspaperPhoto
-            src={notebookPhotos.aerialCity}
-            alt="Aerial photograph of a city — stand-in for CrossViewNet"
-            aspect="landscape"
-            caption="From overhead maps, a ground-level world — 360° panoramas generated from aerial imagery."
-            credit={`${STAND_IN_CREDIT} · Fig. B`}
-          />
+      {/* CrossViewNet — full-width story for ultra-wide result strips */}
+      <section className="np-crossview">
+        <div className="np-crossview-head">
           <p className="np-kicker">Research revival · CVPR lineage</p>
-          <h3 className="np-headline">CrossViewNet: Aerial to Ground Scene Synthesis</h3>
+          <h3 className="np-headline np-headline-xl">
+            CrossViewNet: Aerial to Ground Scene Synthesis
+          </h3>
           <p className="np-meta-line">
             <span>PyTorch 2.x</span>
             <span>Pix2Pix GAN</span>
             <span>U-Net</span>
             <span>AMP</span>
           </p>
-          <p>
-            A legacy CVPR framework brought into PyTorch 2.x, with an eight-stage
+          <p className="np-crossview-dek">
+            A legacy CVPR framework brought into PyTorch 2.x — an eight-stage
             U-Net Pix2Pix GAN synthesizing photorealistic 360° panoramas from
-            top-down aerial imagery. Multi-scale hypercolumns were kept inside a
-            4GB VRAM budget through Automatic Mixed Precision — ambition, under
-            constraint.
+            top-down aerial imagery. Multi-scale hypercolumns stayed inside a
+            4GB VRAM budget through Automatic Mixed Precision. The plates below
+            are the model’s own long views: input, target, and synthesis, side
+            by side.
           </p>
-        </article>
+        </div>
 
+        <div className="np-crossview-plates">
+          <NewspaperPhoto
+            src={notebookPhotos.cross1}
+            alt="CrossViewNet result strip — semantic map, ground truth, and generated view of a mountain road"
+            aspect="banner"
+            caption="Plate I — Segmentation · ground truth · network synthesis along one mountain corridor."
+            credit={`${PROJECT_CREDIT} · Fig. B1`}
+            className="np-crossview-plate"
+          />
+          <NewspaperPhoto
+            src={notebookPhotos.cross2}
+            alt="CrossViewNet result strip — aerial input, countryside panorama, and channel visualisation"
+            aspect="banner"
+            caption="Plate II — Aerial cue · rural panorama · colour-channel readout from the same pipeline."
+            credit={`${PROJECT_CREDIT} · Fig. B2`}
+            className="np-crossview-plate"
+          />
+        </div>
+        <HandAnnotation className="np-projects-note">
+          long views — from sky to street
+        </HandAnnotation>
+      </section>
+
+      <div className="np-double-rule" aria-hidden="true" />
+
+      <div className="np-project-grid">
         <article className="np-project-card">
           <NewspaperPhoto
             src={notebookPhotos.gazeEye}
@@ -134,33 +161,29 @@ function ProjectsPage() {
           </p>
         </article>
 
-        <article className="np-project-card np-project-card-wide">
-          <div className="np-project-inline">
-            <NewspaperPhoto
-              src={notebookPhotos.airplane}
-              alt="Aircraft in flight — stand-in for the AirWizz booking system"
-              aspect="square"
-              caption="Tickets, currency, and a payment rail — all in one engine."
-              credit={`${STAND_IN_CREDIT} · Fig. D`}
-            />
-            <div>
-              <p className="np-kicker">Enterprise brief</p>
-              <h3 className="np-headline">AirWizz Flight Booking System</h3>
-              <p className="np-meta-line">
-                <span>.NET Core MVC</span>
-                <span>C#</span>
-                <span>SQL Server</span>
-                <span>EF Core</span>
-                <span>HBL</span>
-              </p>
-              <p>
-                A full booking engine in ASP.NET Core MVC, backed by a tightly
-                normalised SQL Server schema through Entity Framework. Live
-                currency conversion and HBL payment integration sit in the same
-                ledger — travel, treated as a serious transactional system.
-              </p>
-            </div>
-          </div>
+        <article className="np-project-card">
+          <NewspaperPhoto
+            src={notebookPhotos.airplane}
+            alt="Aircraft in flight — stand-in for the AirWizz booking system"
+            aspect="landscape"
+            caption="Tickets, currency, and a payment rail — all in one engine."
+            credit={`${STAND_IN_CREDIT} · Fig. D`}
+          />
+          <p className="np-kicker">Enterprise brief</p>
+          <h3 className="np-headline">AirWizz Flight Booking System</h3>
+          <p className="np-meta-line">
+            <span>.NET Core MVC</span>
+            <span>C#</span>
+            <span>SQL Server</span>
+            <span>EF Core</span>
+            <span>HBL</span>
+          </p>
+          <p>
+            A full booking engine in ASP.NET Core MVC, backed by a tightly
+            normalised SQL Server schema through Entity Framework. Live
+            currency conversion and HBL payment integration sit in the same
+            ledger — travel, treated as a serious transactional system.
+          </p>
         </article>
       </div>
     </NewspaperPage>

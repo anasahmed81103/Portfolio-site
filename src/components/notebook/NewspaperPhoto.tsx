@@ -3,8 +3,8 @@ type NewspaperPhotoProps = {
   alt: string;
   caption?: string;
   credit?: string;
-  /** Aspect hint for placeholders */
-  aspect?: 'portrait' | 'landscape' | 'square' | 'wide';
+  /** Aspect hint for placeholders; `banner` keeps natural ultra-wide strips */
+  aspect?: 'portrait' | 'landscape' | 'square' | 'wide' | 'banner';
   className?: string;
   placeholderLabel?: string;
 };
