@@ -3,6 +3,8 @@ import { useEffect, useRef, type RefObject } from 'react';
 const INTERACTIVE = 'a, button, [role="button"], input, textarea, label, summary';
 const INK = 'rgba(43, 36, 28, 0.55)';
 const LIFE_MS = 1600;
+/** iOS/Android fire a fake mouse click after every tap. Ignore it. */
+const GHOST_MOUSE_MS = 2000;
 
 type Point = { x: number; y: number };
 
@@ -22,13 +24,18 @@ type IntroInkTrailProps = {
 };
 
 /**
- * Diary scribble layer (HTML canvas). Pointer capture keeps touch from
- * getting stuck “down” when the browser never delivers pointerup.
+ * Diary scribble (HTML canvas). The canvas never receives hits — listeners
+ * live on the intro root so a phone tap cannot capture the page.
+ *
+ * Fingers use TouchEvents. Mouse is desktop-only. Compatibility mouse
+ * events after a tap are ignored (they are what “stuck” the live site).
  */
 function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef(false);
   const pointerIdRef = useRef<number | null>(null);
+  const touchIdRef = useRef<number | null>(null);
+  const lastTouchAtRef = useRef(0);
   const lastRef = useRef<Point | null>(null);
   const segmentsRef = useRef<StrokeSegment[]>([]);
   const rafRef = useRef(0);
@@ -64,6 +71,7 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
     if (!canvas || !root || !active) {
       drawingRef.current = false;
       pointerIdRef.current = null;
+      touchIdRef.current = null;
       lastRef.current = null;
       segmentsRef.current = [];
       const ctx = canvas?.getContext('2d');
@@ -77,11 +85,11 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const pointFromEvent = (event: PointerEvent): Point => {
+    const pointFromClient = (clientX: number, clientY: number): Point => {
       const rect = root.getBoundingClientRect();
       return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
+        x: clientX - rect.left,
+        y: clientY - rect.top,
       };
     };
 
@@ -89,50 +97,20 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
       target instanceof Element && Boolean(target.closest(INTERACTIVE));
 
     const endStroke = () => {
-      const id = pointerIdRef.current;
-      if (id !== null && canvas.hasPointerCapture(id)) {
-        try {
-          canvas.releasePointerCapture(id);
-        } catch {
-          /* capture already released */
-        }
-      }
       drawingRef.current = false;
       pointerIdRef.current = null;
+      touchIdRef.current = null;
       lastRef.current = null;
     };
 
-    const onDown = (event: PointerEvent) => {
-      if (!event.isPrimary) return;
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
-      if (isUi(event.target)) return;
-
+    const startAt = (clientX: number, clientY: number) => {
       drawingRef.current = true;
-      pointerIdRef.current = event.pointerId;
-      lastRef.current = pointFromEvent(event);
-      // Mouse only — capture on iOS/Android often never releases, so the
-      // first tap locks the page. Window listeners below end the stroke.
-      if (event.pointerType === 'mouse') {
-        try {
-          canvas.setPointerCapture(event.pointerId);
-        } catch {
-          /* some browsers reject capture */
-        }
-      }
+      lastRef.current = pointFromClient(clientX, clientY);
     };
 
-    const onMove = (event: PointerEvent) => {
-      if (!drawingRef.current || event.pointerId !== pointerIdRef.current) {
-        return;
-      }
-      // Hover/compatibility moves after a tap must not keep inking.
-      if (event.pointerType === 'mouse' && event.buttons === 0) {
-        endStroke();
-        return;
-      }
-      if (!lastRef.current) return;
-
-      const next = pointFromEvent(event);
+    const moveTo = (clientX: number, clientY: number) => {
+      if (!drawingRef.current || !lastRef.current) return;
+      const next = pointFromClient(clientX, clientY);
       const prev = lastRef.current;
       const dx = next.x - prev.x;
       const dy = next.y - prev.y;
@@ -149,14 +127,81 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
       lastRef.current = next;
     };
 
-    const onUp = (event: PointerEvent) => {
+    const isGhostMouse = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return false;
+      if (performance.now() - lastTouchAtRef.current < GHOST_MOUSE_MS) {
+        return true;
+      }
+      return navigator.maxTouchPoints > 0 && event.pointerType === 'mouse';
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      lastTouchAtRef.current = performance.now();
+      if (isUi(event.target)) return;
+      if (touchIdRef.current !== null) return;
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+      touchIdRef.current = touch.identifier;
+      startAt(touch.clientX, touch.clientY);
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (touchIdRef.current === null) return;
+      for (const touch of Array.from(event.changedTouches)) {
+        if (touch.identifier === touchIdRef.current) {
+          moveTo(touch.clientX, touch.clientY);
+          return;
+        }
+      }
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      lastTouchAtRef.current = performance.now();
+      if (touchIdRef.current === null) {
+        endStroke();
+        return;
+      }
+      for (const touch of Array.from(event.changedTouches)) {
+        if (touch.identifier === touchIdRef.current) {
+          endStroke();
+          return;
+        }
+      }
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.pointerType === 'touch' || event.pointerType === 'pen') {
+        lastTouchAtRef.current = performance.now();
+        return;
+      }
+      if (event.pointerType !== 'mouse' || event.button !== 0) return;
+      if (isGhostMouse(event)) return;
+      if (isUi(event.target)) return;
+      pointerIdRef.current = event.pointerId;
+      startAt(event.clientX, event.clientY);
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return;
+      if (isGhostMouse(event)) {
+        endStroke();
+        return;
+      }
+      if (!drawingRef.current || event.pointerId !== pointerIdRef.current) {
+        return;
+      }
+      if (event.buttons === 0) {
+        endStroke();
+        return;
+      }
+      moveTo(event.clientX, event.clientY);
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return;
       if (pointerIdRef.current !== null && event.pointerId !== pointerIdRef.current) {
         return;
       }
-      endStroke();
-    };
-
-    const onTouchEnd = () => {
       endStroke();
     };
 
@@ -187,29 +232,26 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
 
     rafRef.current = requestAnimationFrame(tick);
 
-    canvas.addEventListener('pointerdown', onDown);
-    canvas.addEventListener('pointermove', onMove);
-    canvas.addEventListener('pointerup', onUp);
-    canvas.addEventListener('pointercancel', onUp);
-    canvas.addEventListener('lostpointercapture', onUp);
-    // Real phones often skip canvas pointerup; window/touch always fires.
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
+    root.addEventListener('touchstart', onTouchStart, { passive: true });
+    root.addEventListener('touchmove', onTouchMove, { passive: true });
     window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    root.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
     window.addEventListener('blur', endStroke);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      canvas.removeEventListener('pointerdown', onDown);
-      canvas.removeEventListener('pointermove', onMove);
-      canvas.removeEventListener('pointerup', onUp);
-      canvas.removeEventListener('pointercancel', onUp);
-      canvas.removeEventListener('lostpointercapture', onUp);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
+      root.removeEventListener('touchstart', onTouchStart);
+      root.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('touchcancel', onTouchEnd);
+      root.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
       window.removeEventListener('blur', endStroke);
       endStroke();
       segmentsRef.current = [];
