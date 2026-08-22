@@ -2,7 +2,6 @@ import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import IntroScene from './intro/IntroScene';
 import IntroStartButton from './intro/IntroStartButton';
 import IntroMobileStartButton from './intro/IntroMobileStartButton';
-import { useIntroDock } from '../hooks/useTouchLayout';
 import IntroSpaceHandoff from './intro/IntroSpaceHandoff';
 import IntroCursor from './intro/IntroCursor';
 import IntroInkTrail from './intro/IntroInkTrail';
@@ -29,7 +28,6 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   const [buttonPressed, setButtonPressed] = useState(false);
   const [inkEnabled, setInkEnabled] = useState(true);
   const lockedRef = useRef(false);
-  const isMobileIntro = useIntroDock();
 
   // Sketch bed — browsers may block until the first click; audio helper retries.
   useLayoutEffect(() => {
@@ -80,21 +78,17 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
           ) : null
         }
         startButton={
-          isMobileIntro ? null : (
-            <IntroStartButton
-              onClick={handleStart}
-              disabled={handingOff || buttonPressed}
-              pressed={buttonPressed}
-            />
-          )
+          <IntroStartButton
+            onClick={handleStart}
+            disabled={handingOff || buttonPressed}
+            pressed={buttonPressed}
+          />
         }
       />
-      {isMobileIntro ? (
-        <IntroMobileStartButton
-          onClick={handleStart}
-          exiting={handingOff || buttonPressed}
-        />
-      ) : null}
+      <IntroMobileStartButton
+        onClick={handleStart}
+        exiting={handingOff || buttonPressed}
+      />
       {handingOff ? (
         <IntroSpaceHandoff onComplete={handleHandoffComplete} />
       ) : null}

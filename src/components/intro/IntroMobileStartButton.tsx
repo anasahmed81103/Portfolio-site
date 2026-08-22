@@ -1,22 +1,40 @@
+import { useEffect, useState } from 'react';
+
 type IntroMobileStartButtonProps = {
   exiting?: boolean;
   onClick: () => void;
 };
 
+const REVEAL_MS = 4200;
+
 /**
- * Mobile-only intro CTA. Separate from the desktop button so GSAP / HMR
- * cannot hide or disable it. Lives inside the intro shell so the black
- * handoff (z-index 30) covers it on the way to Space.
+ * Phone / DevTools-only Start Journey control.
+ * Always mounted; CSS hides it on wide screens. Never uses GSAP.
  */
 function IntroMobileStartButton({
   exiting = false,
   onClick,
 }: IntroMobileStartButtonProps) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setVisible(true), REVEAL_MS);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  const fire = (event: { preventDefault: () => void; stopPropagation: () => void }) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (exiting) return;
+    onClick();
+  };
+
   return (
     <button
       type="button"
-      className={`intro-mobile-start${exiting ? ' is-exiting' : ''}`}
-      onClick={onClick}
+      className={`intro-mobile-start${visible ? ' is-visible' : ''}${exiting ? ' is-exiting' : ''}`}
+      onPointerUp={fire}
+      onClick={fire}
       aria-label="Start journey"
     >
       START JOURNEY
