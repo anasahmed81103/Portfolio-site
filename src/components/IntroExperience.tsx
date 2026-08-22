@@ -27,14 +27,14 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   const [buttonPressed, setButtonPressed] = useState(false);
   const lockedRef = useRef(false);
 
-  // Single sketch bed as the diary draws in (~5s with fade).
+  // Sketch bed — browsers may block until the first click; audio helper retries.
   useLayoutEffect(() => {
     playTransitionOnce('intro-reveal', 'introReveal', {
       volume: 1,
       fadeIn: 0.3,
       fadeOut: 0.7,
       maxDuration: 5,
-      delay: 1.0,
+      delay: 0.35,
     });
   }, []);
 
