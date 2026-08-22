@@ -22,15 +22,13 @@ type IntroInkTrailProps = {
 };
 
 /**
- * Optional scribble layer on the diary (HTML canvas, not Three.js).
- *
- * Pointer-down/move records line segments; requestAnimationFrame redraws
- * them with fading opacity (LIFE_MS). Interactive elements (buttons) are
- * ignored so you can still click START JOURNEY.
+ * Diary scribble layer (HTML canvas). Pointer capture keeps touch from
+ * getting stuck “down” when the browser never delivers pointerup.
  */
 function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef(false);
+  const pointerIdRef = useRef<number | null>(null);
   const lastRef = useRef<Point | null>(null);
   const segmentsRef = useRef<StrokeSegment[]>([]);
   const rafRef = useRef(0);
@@ -65,6 +63,7 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
     const root = rootRef.current;
     if (!canvas || !root || !active) {
       drawingRef.current = false;
+      pointerIdRef.current = null;
       lastRef.current = null;
       segmentsRef.current = [];
       const ctx = canvas?.getContext('2d');
@@ -89,15 +88,41 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
     const isUi = (target: EventTarget | null) =>
       target instanceof Element && Boolean(target.closest(INTERACTIVE));
 
+    const endStroke = () => {
+      const id = pointerIdRef.current;
+      if (id !== null && canvas.hasPointerCapture(id)) {
+        try {
+          canvas.releasePointerCapture(id);
+        } catch {
+          /* capture already released */
+        }
+      }
+      drawingRef.current = false;
+      pointerIdRef.current = null;
+      lastRef.current = null;
+    };
+
     const onDown = (event: PointerEvent) => {
-      if (event.button !== 0 || isUi(event.target)) return;
+      if (!event.isPrimary) return;
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      if (isUi(event.target)) return;
+
       drawingRef.current = true;
+      pointerIdRef.current = event.pointerId;
       lastRef.current = pointFromEvent(event);
+      canvas.setPointerCapture(event.pointerId);
     };
 
     const onMove = (event: PointerEvent) => {
-      if (!drawingRef.current || !lastRef.current) return;
-      if (isUi(event.target)) return;
+      if (!drawingRef.current || event.pointerId !== pointerIdRef.current) {
+        return;
+      }
+      // Hover/compatibility moves after a tap must not keep inking.
+      if (event.pointerType === 'mouse' && event.buttons === 0) {
+        endStroke();
+        return;
+      }
+      if (!lastRef.current) return;
 
       const next = pointFromEvent(event);
       const prev = lastRef.current;
@@ -116,15 +141,16 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
       lastRef.current = next;
     };
 
-    const onUp = () => {
-      drawingRef.current = false;
-      lastRef.current = null;
+    const onUp = (event: PointerEvent) => {
+      if (pointerIdRef.current !== null && event.pointerId !== pointerIdRef.current) {
+        return;
+      }
+      endStroke();
     };
 
     const tick = (now: number) => {
       const w = root.clientWidth;
       const h = root.clientHeight;
-      // Fully clear — never paint paper over the diary underneath.
       ctx.clearRect(0, 0, w, h);
 
       const live: StrokeSegment[] = [];
@@ -149,19 +175,20 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
 
     rafRef.current = requestAnimationFrame(tick);
 
-    root.addEventListener('pointerdown', onDown);
-    root.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
+    canvas.addEventListener('pointerdown', onDown);
+    canvas.addEventListener('pointermove', onMove);
+    canvas.addEventListener('pointerup', onUp);
+    canvas.addEventListener('pointercancel', onUp);
+    canvas.addEventListener('lostpointercapture', onUp);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      root.removeEventListener('pointerdown', onDown);
-      root.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
-      drawingRef.current = false;
-      lastRef.current = null;
+      canvas.removeEventListener('pointerdown', onDown);
+      canvas.removeEventListener('pointermove', onMove);
+      canvas.removeEventListener('pointerup', onUp);
+      canvas.removeEventListener('pointercancel', onUp);
+      canvas.removeEventListener('lostpointercapture', onUp);
+      endStroke();
       segmentsRef.current = [];
       ctx.clearRect(0, 0, root.clientWidth, root.clientHeight);
     };

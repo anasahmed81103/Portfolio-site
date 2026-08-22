@@ -120,6 +120,7 @@
   height: 100%;
   overflow: hidden;
   background: #2a241c;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Restart Journey — top right, restyles per stage (hidden on Intro) */

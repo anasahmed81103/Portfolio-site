@@ -26,16 +26,10 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [handingOff, setHandingOff] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
-  const [inkEnabled, setInkEnabled] = useState(true);
   const lockedRef = useRef(false);
 
   // Sketch bed — browsers may block until the first click; audio helper retries.
   useLayoutEffect(() => {
-    const touchPage = window.matchMedia(
-      '(max-width: 900px), (pointer: coarse)',
-    ).matches;
-    setInkEnabled(!touchPage);
-
     playTransitionOnce('intro-reveal', 'introReveal', {
       volume: 1,
       fadeIn: 0.3,
@@ -72,11 +66,7 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   return (
     <div ref={rootRef} className="intro-experience">
       <IntroScene
-        inkTrail={
-          inkEnabled ? (
-            <IntroInkTrail rootRef={rootRef} active={!handingOff} />
-          ) : null
-        }
+        inkTrail={<IntroInkTrail rootRef={rootRef} active={!handingOff} />}
         startButton={
           <IntroStartButton
             onClick={handleStart}
