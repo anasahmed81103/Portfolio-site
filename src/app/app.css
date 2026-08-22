@@ -1,5 +1,6 @@
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Full-viewport container for the Space Canvas */
@@ -15,6 +16,14 @@
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* Swipes live here so HUD / restart buttons are not under a touch listener. */
+.space-swipe-plane {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  touch-action: none;
 }
 
 /* Crescent moon / star cursor — Space & Earth Dive */
@@ -114,10 +123,14 @@
 }
 
 /* Restart Journey — top right, restyles per stage (hidden on Intro) */
+.restart-label-short {
+  display: none;
+}
+
 .restart-journey {
   position: fixed;
-  top: 0.85rem;
-  right: 0.85rem;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
   z-index: 30;
   margin: 0;
   padding: 0.45rem 0.75rem;
@@ -133,7 +146,8 @@
     box-shadow 0.2s ease;
 }
 
-.restart-journey:hover {
+.restart-journey:hover,
+.restart-journey:active {
   opacity: 0.92;
 }
 
@@ -214,7 +228,7 @@
 .site-watermark {
   position: fixed;
   left: 50%;
-  bottom: 0.55rem;
+  bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
   z-index: 28;
   margin: 0;
   transform: translateX(-50%);
@@ -228,6 +242,7 @@
 }
 
 .site-watermark--intro {
+  z-index: 4;
   font-family: 'Caveat', cursive;
   font-size: clamp(0.78rem, 1.7vw, 0.92rem);
   letter-spacing: 0.04em;
@@ -245,4 +260,43 @@
 .site-watermark--notebook {
   font-family: 'Libre Baskerville', 'Times New Roman', serif;
   color: #1a1510;
+}
+
+@media (max-width: 900px) {
+  .space-experience,
+  .earth-dive-experience,
+  .intro-experience,
+  .notebook-experience {
+    height: 100dvh;
+  }
+
+  .restart-label-full {
+    display: none;
+  }
+
+  .restart-label-short {
+    display: inline;
+  }
+
+  .restart-journey {
+    padding: 0.5rem 0.7rem;
+    min-height: 2.5rem;
+  }
+
+  .site-watermark {
+    max-width: calc(100vw - 2rem);
+    padding: 0 0.5rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.35;
+  }
+
+  /* Sticky newspaper nav already occupies this strip. */
+  .site-watermark--notebook {
+    display: none;
+  }
+
+  .site-watermark--intro {
+    display: none;
+  }
 }

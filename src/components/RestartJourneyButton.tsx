@@ -30,9 +30,12 @@ function RestartJourneyButton({ stage, onRestart }: RestartJourneyButtonProps) {
     <button
       type="button"
       className={`restart-journey restart-journey--${variantForStage(stage)}`}
+      onPointerDown={(event) => event.stopPropagation()}
       onClick={onRestart}
+      aria-label="Restart Journey"
     >
-      Restart Journey
+      <span className="restart-label-full">Restart Journey</span>
+      <span className="restart-label-short">Restart</span>
     </button>
   );
 }

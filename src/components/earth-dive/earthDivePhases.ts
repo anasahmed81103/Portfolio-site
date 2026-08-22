@@ -20,6 +20,40 @@ export const HERO_POSITION = [2.45, 0.32, 2.95] as const;
 export const HERO_LOOK_AT = [0.9, 0.04, -0.7] as const;
 export const HERO_ROLL = 0.05;
 
+/**
+ * Portrait crops the right limb / flare. Nudge the hero shot right so
+ * phones still see half Earth, half space + sun — desktop stays exact.
+ */
+const MOBILE_HERO_POSITION_SHIFT = [0.2, 0, -0.08] as const;
+const MOBILE_HERO_LOOK_SHIFT = [0.12, 0, 0.04] as const;
+
+export function usesMobileHeroFraming(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+export function getHeroPosition(): [number, number, number] {
+  if (!usesMobileHeroFraming()) {
+    return [HERO_POSITION[0], HERO_POSITION[1], HERO_POSITION[2]];
+  }
+  return [
+    HERO_POSITION[0] + MOBILE_HERO_POSITION_SHIFT[0],
+    HERO_POSITION[1] + MOBILE_HERO_POSITION_SHIFT[1],
+    HERO_POSITION[2] + MOBILE_HERO_POSITION_SHIFT[2],
+  ];
+}
+
+export function getHeroLookAt(): [number, number, number] {
+  if (!usesMobileHeroFraming()) {
+    return [HERO_LOOK_AT[0], HERO_LOOK_AT[1], HERO_LOOK_AT[2]];
+  }
+  return [
+    HERO_LOOK_AT[0] + MOBILE_HERO_LOOK_SHIFT[0],
+    HERO_LOOK_AT[1] + MOBILE_HERO_LOOK_SHIFT[1],
+    HERO_LOOK_AT[2] + MOBILE_HERO_LOOK_SHIFT[2],
+  ];
+}
+
 /** After arriving at the hero shot, scroll only spins Earth for this many seconds. */
 export const HERO_SPIN_SECONDS = 2;
 

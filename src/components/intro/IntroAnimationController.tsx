@@ -25,7 +25,9 @@ function IntroAnimationController({ children }: IntroAnimationControllerProps) {
     const root = rootRef.current;
     if (!root) return;
 
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context | undefined;
+    try {
+    ctx = gsap.context(() => {
       const doodles = gsap.utils.toArray<SVGElement>('.intro-doodle', root);
       const plane = root.querySelector<SVGElement>('.intro-transition-plane');
       const doodleStrokes = gsap.utils.toArray<SVGPathElement | SVGCircleElement>(
@@ -77,11 +79,17 @@ function IntroAnimationController({ children }: IntroAnimationControllerProps) {
       }
 
       const prepareStroke = (path: SVGGeometryElement) => {
-        const length = path.getTotalLength();
-        gsap.set(path, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
-        });
+        try {
+          if (typeof path.getTotalLength !== 'function') return;
+          const length = path.getTotalLength();
+          if (!Number.isFinite(length) || length <= 0) return;
+          gsap.set(path, {
+            strokeDasharray: length,
+            strokeDashoffset: length,
+          });
+        } catch {
+          // Some mobile engines throw on ellipse/circle getTotalLength.
+        }
       };
 
       for (const path of [
@@ -95,8 +103,14 @@ function IntroAnimationController({ children }: IntroAnimationControllerProps) {
       }
 
       const strokeDuration = (target: SVGPathElement) => {
-        const length = target.getTotalLength();
-        return Math.max(0.4, Math.min(1.15, length / 900));
+        try {
+          if (typeof target.getTotalLength !== 'function') return 0.55;
+          const length = target.getTotalLength();
+          if (!Number.isFinite(length) || length <= 0) return 0.55;
+          return Math.max(0.4, Math.min(1.15, length / 900));
+        } catch {
+          return 0.55;
+        }
       };
 
       const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
@@ -316,8 +330,17 @@ function IntroAnimationController({ children }: IntroAnimationControllerProps) {
         delay: tl.duration(),
       });
     }, root);
+    } catch {
+      const button = (
+        root.closest('.intro-experience') ?? root
+      ).querySelector<HTMLElement>('.intro-start-button');
+      if (button) {
+        button.style.opacity = '1';
+        button.style.pointerEvents = 'auto';
+      }
+    }
 
-    return () => ctx.revert();
+    return () => ctx?.revert();
   }, []);
 
   return (

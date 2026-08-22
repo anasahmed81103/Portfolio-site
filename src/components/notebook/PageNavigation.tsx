@@ -24,7 +24,11 @@ function PageNavigation({
   const index = NEWSPAPER_PAGES.findIndex((p) => p.id === currentId);
 
   return (
-    <nav className="np-nav" aria-label="Chronicle pages">
+    <nav
+      className="np-nav"
+      aria-label="Chronicle pages"
+      onPointerDown={(event) => event.stopPropagation()}
+    >
       <div className="np-nav-turn">
         <button
           type="button"
@@ -33,7 +37,8 @@ function PageNavigation({
           disabled={!canPrev}
           aria-label="Previous page"
         >
-          ‹ Prev page
+          ‹ <span className="np-nav-btn-full">Prev page</span>
+          <span className="np-nav-btn-short">Prev</span>
         </button>
         <p className="np-nav-status">
           Page {index + 1} of {NEWSPAPER_PAGES.length}
@@ -45,7 +50,8 @@ function PageNavigation({
           disabled={!canNext}
           aria-label="Next page"
         >
-          Next page ›
+          <span className="np-nav-btn-full">Next page</span>
+          <span className="np-nav-btn-short">Next</span> ›
         </button>
       </div>
 

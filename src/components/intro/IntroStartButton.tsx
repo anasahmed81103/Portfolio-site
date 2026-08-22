@@ -4,7 +4,7 @@ type IntroStartButtonProps = {
   onClick: () => void;
 };
 
-/** Paper-style diary CTA — the only trigger into Space. */
+/** Desktop diary CTA — GSAP in IntroAnimationController fades this in. */
 function IntroStartButton({ disabled, pressed, onClick }: IntroStartButtonProps) {
   return (
     <button

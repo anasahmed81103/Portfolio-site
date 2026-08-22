@@ -26,6 +26,7 @@ import {
 } from 'three';
 import { useScrollAcceleration } from '../../hooks/useScrollAcceleration.ts';
 import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
+import { prefersReducedGpu } from '../../hooks/useTouchLayout';
 
 type StarLayerData = {
   geometry: BufferGeometry;
@@ -224,14 +225,24 @@ function Starfield() {
   const animTimeRef = useRef(0);
   const { intensity } = useScrollAcceleration();
 
-  const layers = useMemo(
-    () => ({
-      small: createStarLayer(SMALL_CONFIG),
-      medium: createStarLayer(MEDIUM_CONFIG),
-      large: createStarLayer(LARGE_CONFIG),
-    }),
-    [],
-  );
+  const layers = useMemo(() => {
+    // Fewer points on phones so the Earth shader stays smooth.
+    const density = prefersReducedGpu() ? 0.42 : 1;
+    return {
+      small: createStarLayer({
+        ...SMALL_CONFIG,
+        count: Math.round(SMALL_CONFIG.count * density),
+      }),
+      medium: createStarLayer({
+        ...MEDIUM_CONFIG,
+        count: Math.round(MEDIUM_CONFIG.count * density),
+      }),
+      large: createStarLayer({
+        ...LARGE_CONFIG,
+        count: Math.round(LARGE_CONFIG.count * density),
+      }),
+    };
+  }, []);
 
   useFrame((_, delta) => {
     const scroll = intensity.current;

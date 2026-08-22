@@ -3,11 +3,16 @@ import { diveProgressRef } from '../../hooks/useDiveProgress';
 import { APPROACH_END } from '../earth-dive/earthDivePhases';
 import './SpaceHud.css';
 
+type EarthSpinHintProps = {
+  /** Phones / tablets: “keep swiping” instead of “keep scrolling”. */
+  touchCopy?: boolean;
+};
+
 /**
  * Bottom-right cue while approaching Earth —
  * from the first move toward the planet through the hero spin lock.
  */
-function EarthSpinHint() {
+function EarthSpinHint({ touchCopy = false }: EarthSpinHintProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -31,7 +36,7 @@ function EarthSpinHint() {
       aria-hidden={!visible}
     >
       <span className="space-scroll-hint-row">
-        almost there, keep scrolling
+        {touchCopy ? 'keep swiping' : 'almost there, keep scrolling'}
       </span>
     </p>
   );

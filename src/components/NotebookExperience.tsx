@@ -107,6 +107,49 @@ function NotebookExperience() {
     [goToIndex],
   );
 
+  // Horizontal swipe turns the page; vertical motion stays as reading scroll.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+    const onStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest('button, a, input, textarea')
+      ) {
+        tracking = false;
+        return;
+      }
+      tracking = true;
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+    };
+
+    const onEnd = (event: TouchEvent) => {
+      if (!tracking) return;
+      tracking = false;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      if (Math.abs(dx) < 64) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      if (dx < 0) goNext();
+      else goPrev();
+    };
+
+    stage.addEventListener('touchstart', onStart, { passive: true });
+    stage.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      stage.removeEventListener('touchstart', onStart);
+      stage.removeEventListener('touchend', onEnd);
+    };
+  }, [goNext, goPrev]);
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight' || event.key === 'PageDown') {

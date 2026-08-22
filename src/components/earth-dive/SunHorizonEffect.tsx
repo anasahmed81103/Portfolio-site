@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { EARTH_RADIUS, SUN_POSITION } from '../space/earthConfig';
 import { diveProgressRef } from '../../hooks/useDiveProgress';
-import { APPROACH_END, getFlashT, HERO_POSITION } from './earthDivePhases';
+import { APPROACH_END, getFlashT, getHeroPosition } from './earthDivePhases';
 
 /**
  * Cinematic Sun + horizon bloom for Earth Dive only.
@@ -58,7 +58,7 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
  * Must match EarthDiveController hero pose.
  * Used only to measure how close the live camera is — does not move the camera.
  */
-const HERO_CAMERA_POSITION = new Vector3(...HERO_POSITION);
+const HERO_CAMERA_POSITION = new Vector3(...getHeroPosition());
 
 /** Start building earlier in the longer approach so the sun ramp feels gradual. */
 const EFFECT_START_DISTANCE = 4.2;

@@ -9,6 +9,7 @@ import './intro.css';
 
 type IntroSceneProps = {
   startButton?: ReactNode;
+  inkTrail?: ReactNode;
 };
 
 /**
@@ -16,7 +17,7 @@ type IntroSceneProps = {
  * one GSAP timeline can find `.intro-doodle`, `.intro-polaroid`, etc. via
  * CSS class names (see intro.css).
  */
-function IntroScene({ startButton }: IntroSceneProps) {
+function IntroScene({ startButton, inkTrail }: IntroSceneProps) {
   return (
     <IntroAnimationController>
       <IntroPage />
@@ -24,6 +25,7 @@ function IntroScene({ startButton }: IntroSceneProps) {
       <IntroAnnotations />
       <IntroPolaroids />
       <IntroSignature />
+      {inkTrail}
       {startButton}
     </IntroAnimationController>
   );

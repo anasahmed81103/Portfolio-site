@@ -33,6 +33,7 @@ function SpaceProgressButton({
     <button
       type="button"
       className={`space-progress-button${shown ? ' is-visible' : ''}${exiting ? ' is-exiting' : ''}`}
+      onPointerDown={(event) => event.stopPropagation()}
       onClick={onProgress}
       tabIndex={shown ? 0 : -1}
       aria-hidden={!shown}

@@ -21,9 +21,12 @@ import { diveProgressRef } from '../../hooks/useDiveProgress';
 import { EARTH_RADIUS, SUN_POSITION } from '../space/earthConfig';
 import {
   APPROACH_END,
+  getHeroLookAt,
+  getHeroPosition,
   HERO_LOOK_AT,
   HERO_POSITION,
   HERO_ROLL,
+  usesMobileHeroFraming,
 } from './earthDivePhases';
 
 type CameraKeyframe = {
@@ -227,12 +230,36 @@ function sampleCamera(progress: number): {
   return sampleDiveCamera(diveT);
 }
 
+/** Blend 0 at orbit start → 1 at the hero lock (and through the dive). */
+function mobileHeroWeight(progress: number): number {
+  if (progress < APPROACH_END) {
+    return smootherstep01(progress / APPROACH_END);
+  }
+  // Drop the rightward bias so the dive enters the limb, not empty space.
+  const diveT = (progress - APPROACH_END) / (1 - APPROACH_END);
+  return 1 - smootherstep01(Math.min(1, diveT / 0.28));
+}
+
 function EarthDiveController() {
   const { camera } = useThree();
   const upAxis = useRef(new Vector3(0, 1, 0));
+  const mobileHero = useRef(usesMobileHeroFraming());
 
   useFrame(() => {
-    const { position, lookAt, roll } = sampleCamera(diveProgressRef.current);
+    const progress = diveProgressRef.current;
+    const { position, lookAt, roll } = sampleCamera(progress);
+
+    if (mobileHero.current) {
+      const w = mobileHeroWeight(progress);
+      const heroPos = getHeroPosition();
+      const heroLook = getHeroLookAt();
+      position.x += (heroPos[0] - HERO_POSITION[0]) * w;
+      position.y += (heroPos[1] - HERO_POSITION[1]) * w;
+      position.z += (heroPos[2] - HERO_POSITION[2]) * w;
+      lookAt.x += (heroLook[0] - HERO_LOOK_AT[0]) * w;
+      lookAt.y += (heroLook[1] - HERO_LOOK_AT[1]) * w;
+      lookAt.z += (heroLook[2] - HERO_LOOK_AT[2]) * w;
+    }
 
     camera.position.copy(position);
     camera.up.copy(upAxis.current);

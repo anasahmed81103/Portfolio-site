@@ -34,6 +34,7 @@ import {
   heroSpinElapsedRef,
 } from './earth-dive/earthDivePhases';
 import { planetYawDriveRef } from '../hooks/planetYawDrive';
+import { prefersReducedGpu, useTouchLayout } from '../hooks/useTouchLayout';
 
 /** Slower scrub while closing in from space — soft, cinematic approach. */
 const APPROACH_WHEEL_SCALE = 0.00028;
@@ -43,6 +44,51 @@ const DIVE_WHEEL_SCALE = 0.00055;
 
 /** Wheel burst while waiting in the hero spin window. */
 const SPIN_WHEEL_BURST_SCALE = 2.4;
+
+/** Touch pixels feel smaller than wheel ticks — boost swipe so phones keep pace. */
+const TOUCH_DELTA_SCALE = 1.6;
+
+/** Bind vertical swipe to a dedicated plane so HUD buttons keep their taps. */
+function bindSwipeSurface(
+  surface: HTMLElement,
+  onDelta: (deltaY: number) => void,
+): () => void {
+  let lastY = 0;
+  let tracking = false;
+  let pointerId: number | null = null;
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType === 'mouse') return;
+    tracking = true;
+    pointerId = event.pointerId;
+    lastY = event.clientY;
+    surface.setPointerCapture(event.pointerId);
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!tracking || event.pointerId !== pointerId) return;
+    event.preventDefault();
+    onDelta((lastY - event.clientY) * TOUCH_DELTA_SCALE);
+    lastY = event.clientY;
+  };
+
+  const onPointerUp = (event: PointerEvent) => {
+    if (event.pointerId !== pointerId) return;
+    tracking = false;
+    pointerId = null;
+  };
+
+  surface.addEventListener('pointerdown', onPointerDown);
+  surface.addEventListener('pointermove', onPointerMove, { passive: false });
+  surface.addEventListener('pointerup', onPointerUp);
+  surface.addEventListener('pointercancel', onPointerUp);
+  return () => {
+    surface.removeEventListener('pointerdown', onPointerDown);
+    surface.removeEventListener('pointermove', onPointerMove);
+    surface.removeEventListener('pointerup', onPointerUp);
+    surface.removeEventListener('pointercancel', onPointerUp);
+  };
+}
 
 function feedSpaceAcceleration(deltaY: number, burstScale = 1) {
   const burst =
@@ -71,10 +117,10 @@ type OrbitalExperienceProps = {
  * `<Canvas>` (React Three Fiber) creates a WebGL renderer and a default camera.
  * Everything inside it is a 3D object; HUD hints outside it are normal HTML.
  *
- * Wheel listeners live here (DOM), not in Three.js:
- * - Space: scroll pokes scrollTargetRef (planet spin / reverse)
- * - Dive: scroll also advances diveTargetRef (camera path), with special
- *   rules at the hero-lock spin window
+ * Wheel + vertical swipe listeners live here (DOM), not in Three.js:
+ * - Space: scroll/swipe pokes scrollTargetRef (planet spin / reverse)
+ * - Dive: the same input also advances diveTargetRef (camera path), with
+ *   special rules at the hero-lock spin window
  *
  * The dark “vision veil” is a CSS overlay GSAP fades out as space appears.
  */
@@ -84,11 +130,14 @@ function OrbitalExperience({
   onBookHandoff,
 }: OrbitalExperienceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const swipeRef = useRef<HTMLDivElement>(null);
   const veilRef = useRef<HTMLDivElement>(null);
   const lockedRef = useRef(false);
   const [exiting, setExiting] = useState(false);
 
   const isDive = stage === ExperienceStage.EarthDive;
+  const touchLayout = useTouchLayout();
+  const canvasDpr = prefersReducedGpu() ? ([1, 1.5] as [number, number]) : undefined;
 
   const handleProgress = useCallback(() => {
     if (lockedRef.current || !onProgressToDive || isDive) return;
@@ -169,26 +218,33 @@ function OrbitalExperience({
     return () => ctx.revert();
   }, []);
 
-  // Space wheel — inactive once dive takes over.
+  // Space wheel / swipe — inactive once dive takes over.
   useEffect(() => {
     if (isDive) return;
 
     const root = containerRef.current;
     if (!root) return;
 
-    const onWheel = (event: WheelEvent) => {
+    const applySpaceDelta = (deltaY: number) => {
       if (lockedRef.current) return;
-      const burst = Math.min(0.32, Math.abs(event.deltaY) / 280);
-      const signedBurst = event.deltaY < 0 ? -burst : burst;
+      const burst = Math.min(0.32, Math.abs(deltaY) / 280);
+      const signedBurst = deltaY < 0 ? -burst : burst;
       scrollTargetRef.current = Math.max(
         -1,
         Math.min(1, scrollTargetRef.current + signedBurst),
       );
     };
 
+    const onWheel = (event: WheelEvent) => {
+      applySpaceDelta(event.deltaY);
+    };
+
     root.addEventListener('wheel', onWheel, { passive: true });
+    const swipe = swipeRef.current;
+    const unbindSwipe = swipe ? bindSwipeSurface(swipe, applySpaceDelta) : undefined;
     return () => {
       root.removeEventListener('wheel', onWheel);
+      unbindSwipe?.();
     };
   }, [isDive]);
 
@@ -199,7 +255,7 @@ function OrbitalExperience({
     const root = containerRef.current;
     if (!root) return;
 
-    const onWheel = (event: WheelEvent) => {
+    const applyDiveDelta = (deltaY: number, fromTouch = false) => {
       const target = diveTargetRef.current;
       const atHero = target >= APPROACH_END - 0.0001;
       const gateOpen = earthSpinGateOpenRef.current;
@@ -207,12 +263,14 @@ function OrbitalExperience({
       if (!atHero) {
         diveTargetRef.current = Math.min(
           APPROACH_END,
-          Math.max(0, target + event.deltaY * APPROACH_WHEEL_SCALE),
+          Math.max(0, target + deltaY * APPROACH_WHEEL_SCALE),
         );
         const weight = accelerationHandoffWeight(diveProgressRef.current);
-        if (weight > 0.001) {
-          const burst =
-            Math.min(0.32, Math.abs(event.deltaY) / 280) * weight;
+        // Swipe covers the approach faster than a wheel, so the desktop
+        // fade-out would kill spin almost immediately. Keep swipe-to-spin.
+        const spinWeight = fromTouch ? Math.max(weight, 0.7) : weight;
+        if (spinWeight > 0.001) {
+          const burst = Math.min(0.32, Math.abs(deltaY) / 280) * spinWeight;
           scrollTargetRef.current = Math.min(
             1,
             scrollTargetRef.current + burst,
@@ -223,27 +281,36 @@ function OrbitalExperience({
 
       if (!gateOpen) {
         diveTargetRef.current = APPROACH_END;
-        if (event.deltaY < 0) {
+        if (deltaY < 0) {
           diveTargetRef.current = Math.min(
             APPROACH_END,
-            Math.max(0, target + event.deltaY * APPROACH_WHEEL_SCALE),
+            Math.max(0, target + deltaY * APPROACH_WHEEL_SCALE),
           );
           return;
         }
-        feedSpaceAcceleration(event.deltaY, SPIN_WHEEL_BURST_SCALE);
+        feedSpaceAcceleration(deltaY, SPIN_WHEEL_BURST_SCALE);
         return;
       }
 
-      feedSpaceAcceleration(event.deltaY, 1);
+      feedSpaceAcceleration(deltaY, 1);
       diveTargetRef.current = Math.min(
         1,
-        Math.max(APPROACH_END, target + event.deltaY * DIVE_WHEEL_SCALE),
+        Math.max(APPROACH_END, target + deltaY * DIVE_WHEEL_SCALE),
       );
     };
 
+    const onWheel = (event: WheelEvent) => {
+      applyDiveDelta(event.deltaY);
+    };
+
     root.addEventListener('wheel', onWheel, { passive: true });
+    const swipe = swipeRef.current;
+    const unbindSwipe = swipe
+      ? bindSwipeSurface(swipe, (deltaY) => applyDiveDelta(deltaY, true))
+      : undefined;
     return () => {
       root.removeEventListener('wheel', onWheel);
+      unbindSwipe?.();
       diveTargetRef.current = 0;
       diveProgressRef.current = 0;
       heroSpinElapsedRef.current = 0;
@@ -265,6 +332,7 @@ function OrbitalExperience({
   return (
     <div ref={containerRef} className="space-experience">
       <Canvas
+        dpr={canvasDpr}
         camera={{ position: [0, 0, 12.5], fov: 38, near: 0.1, far: 400 }}
       >
         <color attach="background" args={['#000000']} />
@@ -279,13 +347,27 @@ function OrbitalExperience({
         <div className="space-vision-veil-soft" />
       </div>
 
+      <div ref={swipeRef} className="space-swipe-plane" aria-hidden="true" />
+
       <SpaceScrollHint
-        label={isDive ? 'scroll down' : 'scroll'}
+        label={
+          isDive
+            ? touchLayout
+              ? 'swipe down'
+              : 'scroll down'
+            : touchLayout
+              ? 'swipe'
+              : 'scroll'
+        }
         showArrow={isDive}
       />
-      {isDive ? <EarthSpinHint /> : null}
+      {isDive ? <EarthSpinHint touchCopy={touchLayout} /> : null}
       {!isDive && onProgressToDive ? (
-        <SpaceProgressButton onProgress={handleProgress} exiting={exiting} />
+        <SpaceProgressButton
+          onProgress={handleProgress}
+          exiting={exiting}
+          delayMs={5000}
+        />
       ) : null}
       <SpaceCursor rootRef={containerRef} />
     </div>

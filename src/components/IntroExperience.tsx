@@ -1,6 +1,8 @@
-import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import IntroScene from './intro/IntroScene';
 import IntroStartButton from './intro/IntroStartButton';
+import IntroMobileStartButton from './intro/IntroMobileStartButton';
+import { useIntroDock } from '../hooks/useTouchLayout';
 import IntroSpaceHandoff from './intro/IntroSpaceHandoff';
 import IntroCursor from './intro/IntroCursor';
 import IntroInkTrail from './intro/IntroInkTrail';
@@ -25,10 +27,17 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [handingOff, setHandingOff] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
+  const [inkEnabled, setInkEnabled] = useState(true);
   const lockedRef = useRef(false);
+  const isMobileIntro = useIntroDock();
 
   // Sketch bed — browsers may block until the first click; audio helper retries.
   useLayoutEffect(() => {
+    const touchPage = window.matchMedia(
+      '(max-width: 900px), (pointer: coarse)',
+    ).matches;
+    setInkEnabled(!touchPage);
+
     playTransitionOnce('intro-reveal', 'introReveal', {
       volume: 1,
       fadeIn: 0.3,
@@ -42,13 +51,16 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
     if (lockedRef.current) return;
     lockedRef.current = true;
     setButtonPressed(true);
-    // Rocket waits for the plane handoff to actually start.
-    playTransition('rocket', {
-      volume: 0.8,
-      fadeIn: 0.12,
-      fadeOut: 0.65,
-      delay: 0.2,
-    });
+    try {
+      playTransition('rocket', {
+        volume: 0.8,
+        fadeIn: 0.12,
+        fadeOut: 0.65,
+        delay: 0.2,
+      });
+    } catch {
+      /* Audio must never block the Space handoff. */
+    }
 
     window.setTimeout(() => {
       setHandingOff(true);
@@ -59,18 +71,30 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
     onSpaceHandoff?.();
   }, [onSpaceHandoff]);
 
-  const startButton: ReactNode = (
-    <IntroStartButton
-      onClick={handleStart}
-      disabled={handingOff || buttonPressed}
-      pressed={buttonPressed}
-    />
-  );
-
   return (
     <div ref={rootRef} className="intro-experience">
-      <IntroScene startButton={startButton} />
-      <IntroInkTrail rootRef={rootRef} active={!handingOff} />
+      <IntroScene
+        inkTrail={
+          inkEnabled ? (
+            <IntroInkTrail rootRef={rootRef} active={!handingOff} />
+          ) : null
+        }
+        startButton={
+          isMobileIntro ? null : (
+            <IntroStartButton
+              onClick={handleStart}
+              disabled={handingOff || buttonPressed}
+              pressed={buttonPressed}
+            />
+          )
+        }
+      />
+      {isMobileIntro ? (
+        <IntroMobileStartButton
+          onClick={handleStart}
+          exiting={handingOff || buttonPressed}
+        />
+      ) : null}
       {handingOff ? (
         <IntroSpaceHandoff onComplete={handleHandoffComplete} />
       ) : null}
