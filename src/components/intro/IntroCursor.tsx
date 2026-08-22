@@ -16,12 +16,6 @@ function IntroCursor({ rootRef }: IntroCursorProps) {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    // iOS flips hover:hover after the first tap; never take over the pointer
-    // on a touch device or the intro feels “stuck” in a desktop cursor mode.
-    if (navigator.maxTouchPoints > 0) {
-      setEnabled(false);
-      return;
-    }
     const media = window.matchMedia(FINE_POINTER);
     const sync = () => setEnabled(media.matches);
     sync();
