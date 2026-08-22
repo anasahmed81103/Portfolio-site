@@ -113,21 +113,6 @@
   background: #2a241c;
 }
 
-/* Temporary stage jump nav — stays visible over full-viewport scenes */
-nav {
-  position: fixed;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 10;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-nav button {
-  cursor: pointer;
-}
-
 /* Restart Journey — top right, restyles per stage (hidden on Intro) */
 .restart-journey {
   position: fixed;

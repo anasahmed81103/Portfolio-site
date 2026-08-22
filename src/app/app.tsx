@@ -32,18 +32,6 @@ function App() {
           setCurrentStage(ExperienceStage.Intro);
         }}
       />
-
-      <nav>
-        {Object.values(ExperienceStage).map((stage) => (
-          <button
-            key={stage}
-            type="button"
-            onClick={() => setCurrentStage(stage)}
-          >
-            {stage}
-          </button>
-        ))}
-      </nav>
     </>
   );
 }
