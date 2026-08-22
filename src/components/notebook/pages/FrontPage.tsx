@@ -1,34 +1,10 @@
 import NewspaperPage from '../NewspaperPage';
 import NewspaperHeader from '../NewspaperHeader';
 import Article from '../Article';
-import MediaSlideshow from '../MediaSlideshow';
+import NewspaperPhoto from '../NewspaperPhoto';
 import HandAnnotation from '../HandAnnotation';
 import { PROFILE } from '../newspaperData';
-import { notebookPhotos, STAND_IN_CREDIT } from '../notebookPhotos';
-
-const FRONT_PLATES = [
-  {
-    src: notebookPhotos.deskCode,
-    alt: 'A workstation with code on screen — stand-in photograph',
-    label: 'Fig. I · Desk',
-    caption: 'The working portrait — where enterprise systems and models share a desk.',
-    credit: STAND_IN_CREDIT,
-  },
-  {
-    src: notebookPhotos.transformer,
-    alt: 'Electrical equipment photographed as a stand-in for industrial vision work',
-    label: 'Fig. II · THI-Portal',
-    caption: 'THI-Portal — industrial vision, identifying a transformer in real time.',
-    credit: STAND_IN_CREDIT,
-  },
-  {
-    src: notebookPhotos.codeScreen,
-    alt: 'Close-up of programming on a screen — stand-in photograph',
-    label: 'Fig. III · Motion',
-    caption: 'A still from the work: code, inference, and the interface between them.',
-    credit: STAND_IN_CREDIT,
-  },
-] as const;
+import { notebookPhotos } from '../notebookPhotos';
 
 /** PAGE 1 — Front page: masthead, hero headline, profile, teasers. */
 function FrontPage() {
@@ -49,13 +25,16 @@ function FrontPage() {
 
       <div className="np-front-grid">
         <div className="np-front-main">
-          <MediaSlideshow
-            slides={FRONT_PLATES}
+          <NewspaperPhoto
+            src={notebookPhotos.portrait}
+            alt={`Portrait of ${PROFILE.fullName}`}
             aspect="portrait"
-            intervalMs={4200}
+            caption={`${PROFILE.fullName} — ${PROFILE.title}, photographed for this edition.`}
+            credit="Staff portrait · Plate I"
+            className="np-front-portrait"
           />
           <HandAnnotation className="np-front-note">
-            the work, in motion
+            the man of the hour
           </HandAnnotation>
         </div>
 

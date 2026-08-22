@@ -18,7 +18,7 @@ recorded here).
 | `aerial-city.jpg` | Aerial city view | [Pexels 466685](https://www.pexels.com/photo/466685/) |
 | `gaze-eye.jpg` | Eye / gaze | [Pexels 887751](https://www.pexels.com/photo/887751/) |
 | `airplane.jpg` | Aircraft | [Pexels 46148](https://www.pexels.com/photo/46148/) |
-| `campus.jpg` | University campus | [Pexels 207692](https://www.pexels.com/photo/207692/) |
+| `portrait.jpg` | Staff portrait of Anas Ahmed | GitHub public avatar (`anasahmed81103`) — replace with a higher-resolution original when ready |
 
 These are generic stand-ins, not photographs of Muhammad Anas Ahmed Shaikh
 or of FAST-NUCES / K-Electric specifically.

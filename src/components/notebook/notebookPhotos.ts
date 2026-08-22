@@ -13,6 +13,7 @@ export const notebookPhotos = {
   gazeEye: '/assets/notebook/gaze-eye.jpg',
   airplane: '/assets/notebook/airplane.jpg',
   campus: '/assets/notebook/campus.jpg',
+  portrait: '/assets/notebook/portrait.jpg',
 } as const;
 
 export const STAND_IN_CREDIT = 'Stand-in · Pexels';
