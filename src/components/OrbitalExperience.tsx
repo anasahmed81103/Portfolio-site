@@ -66,8 +66,17 @@ type OrbitalExperienceProps = {
 };
 
 /**
- * Single Canvas for Space and Earth Dive.
- * Stage changes only flip in-scene systems — no WebGL remount / black flash.
+ * DOM shell around the shared Space / Earth Dive WebGL Canvas.
+ *
+ * `<Canvas>` (React Three Fiber) creates a WebGL renderer and a default camera.
+ * Everything inside it is a 3D object; HUD hints outside it are normal HTML.
+ *
+ * Wheel listeners live here (DOM), not in Three.js:
+ * - Space: scroll pokes scrollTargetRef (planet spin / reverse)
+ * - Dive: scroll also advances diveTargetRef (camera path), with special
+ *   rules at the hero-lock spin window
+ *
+ * The dark “vision veil” is a CSS overlay GSAP fades out as space appears.
  */
 function OrbitalExperience({
   stage,

@@ -6,10 +6,17 @@ type IntroAnimationControllerProps = {
 };
 
 /**
- * Owns the intro scene root and runs entrance + idle GSAP motion.
- * Wrapping children (instead of reading a parent ref) keeps the animated
- * DOM and the effect on the same component — same idea as tickers/controllers
- * living inside Space / Earth Dive scenes.
+ * GSAP director for the intro page.
+ *
+ * On mount it:
+ * 1. Hides doodles / polaroids / notes / signature (gsap.set)
+ * 2. Prepares SVG strokes with stroke-dasharray = path length and
+ *    stroke-dashoffset = path length (the line is “invisible”)
+ * 3. Tweens dashoffset → 0 so each stroke looks like it is being drawn
+ * 4. Starts gentle idle loops (wiggle, float) after the entrance
+ *
+ * `gsap.utils.toArray('.class', root)` is “querySelectorAll, but a real array”.
+ * `gsap.context` + revert() cleans tweens if we leave the intro mid-animation.
  */
 function IntroAnimationController({ children }: IntroAnimationControllerProps) {
   const rootRef = useRef<HTMLDivElement>(null);

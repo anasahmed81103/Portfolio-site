@@ -10,7 +10,8 @@ type PageNavigationProps = {
 };
 
 /**
- * Edition navigation — newspaper “continued on” bar, not a modern navbar.
+ * Prev / next / jump bar at the bottom of the newspaper.
+ * Looks like an index, not a website navbar. Wired from NotebookExperience.
  */
 function PageNavigation({
   currentId,

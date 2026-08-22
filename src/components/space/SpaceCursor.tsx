@@ -8,8 +8,10 @@ type SpaceCursorProps = {
 };
 
 /**
- * Crescent moon drifting through space; bright star on HUD controls.
- * Fine pointers only — phones keep the native cursor.
+ * Custom cursor for Space / Earth Dive (moon in empty space, star on buttons).
+ * `matchMedia('(hover: hover) and (pointer: fine)')` skips phones / trackpads
+ * that are not precise — those keep the OS cursor.
+ * The CSS class `space-fine-pointer` hides the native cursor (app.css).
  */
 function SpaceCursor({ rootRef }: SpaceCursorProps) {
   const cursorRef = useRef<HTMLDivElement>(null);

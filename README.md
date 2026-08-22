@@ -93,6 +93,22 @@ scripts/               # Signature path generator
 - Photo paths → `src/components/notebook/notebookPhotos.ts` (files under `public/assets/notebook/`)
 - Sound paths → `src/audio/sounds.ts`
 
+### How to read the code
+
+Source files now have teaching comments (what the file does, which library, why a trick exists). Suggested order:
+
+1. `src/app/experience.ts` + `ExperienceController.tsx` — stage machine  
+2. `src/audio/stageAudio.ts` — how sounds unlock, fade, and loop  
+3. `src/hooks/*` — refs that wheel / `useFrame` write without re-rendering React  
+4. `src/components/intro/IntroAnimationController.tsx` — GSAP draw-on + idle  
+5. `src/components/space/Earth.tsx` + `Starfield.tsx` — shaders and GPU points  
+6. `src/components/earth-dive/EarthDiveController.tsx` + `earthDivePhases.ts` — camera path  
+7. `src/components/NotebookExperience.tsx` — newspaper page turns  
+
+`useFrame` (React Three Fiber) = “run this every rendered frame.”  
+GSAP timelines = sequenced tweens.  
+`stroke-dashoffset` = SVG “ink drawing itself.”
+
 ---
 
 ## Notebook sections

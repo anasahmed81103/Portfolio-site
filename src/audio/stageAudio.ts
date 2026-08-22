@@ -1,20 +1,41 @@
+/**
+ * Site-wide audio helper (plain HTMLAudioElement — no extra library).
+ *
+ * Why this file exists:
+ * 1. Browsers refuse to play sound until the user has gestured (click, key, move).
+ * 2. We need short “one-shot” cues (page flip, rocket) AND looping beds (space).
+ * 3. React Strict Mode remounts effects twice in dev — we must not double-play reveals.
+ *
+ * Mental model:
+ * - playTransition()  → play once, fade in, fade out, then dispose
+ * - playTransitionOnce() → same, but remember a string key so it cannot fire twice
+ * - playLoop() / stopLoop() → named looping beds (key = 'space')
+ * - setLoopVolume() → change volume of a running loop without restarting it
+ * - resetAudioSession() → Restart Journey: stop loops + allow reveals again
+ */
 import { SOUNDS, type SoundId } from './sounds';
 
 const DEFAULT_FADE_IN = 0.2;
 const DEFAULT_FADE_OUT = 0.6;
-/** Transition one-shots (reveal / rocket / flip accents) — hard cap. */
+/** Hard cap so a long MP3 does not keep playing after the visual transition. */
 const TRANSITION_MAX_SEC = 5;
 
+/** Handle returned by fadeVolume so a newer fade can cancel an older one. */
 type FadeHandle = {
   cancel: () => void;
 };
 
+/** Active looping beds, keyed by a name we choose (usually 'space'). */
 const loops = new Map<string, HTMLAudioElement>();
+/** In-flight volume fades for those loops. */
 const loopFades = new Map<string, FadeHandle>();
+/** Keys already used by playTransitionOnce (cleared on restart). */
 const playedOnce = new Set<string>();
+/** Cached Audio elements so the first play does not wait on disk/network. */
 const preloaded = new Map<SoundId, HTMLAudioElement>();
 
 let unlocked = false;
+/** Play attempts that arrived before the first user gesture. */
 const pending: Array<() => void> = [];
 
 function tryUnlock() {
@@ -24,6 +45,7 @@ function tryUnlock() {
   for (const run of queued) run();
 }
 
+/** Run now if unlocked; otherwise wait for the first gesture. */
 function whenUnlocked(run: () => void) {
   if (unlocked) {
     run();
@@ -32,7 +54,7 @@ function whenUnlocked(run: () => void) {
   pending.push(run);
 }
 
-/** Warm the audio element cache so cues start without a load hitch. */
+/** Create Audio() objects and call load() so cues start instantly later. */
 export function preloadSounds() {
   if (typeof window === 'undefined') return;
   for (const id of Object.keys(SOUNDS) as SoundId[]) {
@@ -44,7 +66,7 @@ export function preloadSounds() {
   }
 }
 
-/** Call once from the app shell so the first gesture unlocks autoplay. */
+/** One-time listeners on the window. Safe to call from App on mount. */
 export function installAudioUnlock() {
   if (typeof window === 'undefined') return;
   preloadSounds();
@@ -59,6 +81,15 @@ function cancelFade(handle: FadeHandle | undefined) {
   handle?.cancel();
 }
 
+/**
+ * Animate audio.volume from current → `to` over `durationSec` seconds.
+ *
+ * Uses requestAnimationFrame (the browser’s paint loop), not GSAP, so audio
+ * stays independent of visual timelines.
+ *
+ * The curve `t * t * (3 - 2 * t)` is a smoothstep ease — slow at the ends,
+ * faster in the middle. That sounds more natural than a linear fade.
+ */
 function fadeVolume(
   audio: HTMLAudioElement,
   to: number,
@@ -92,6 +123,10 @@ function fadeVolume(
   };
 }
 
+/**
+ * Fresh Audio element for this play.
+ * We clone the preloaded node so two cues can overlap (rocket + space reveal).
+ */
 function cloneSound(id: SoundId): HTMLAudioElement {
   const cached = preloaded.get(id);
   if (cached) {
@@ -111,8 +146,9 @@ function startPlayback(audio: HTMLAudioElement): Promise<void> {
 }
 
 /**
- * One-shot cue with fade in/out, capped at ~3s for transition sounds.
- * Tries immediately; if the browser blocks autoplay, retries on first gesture.
+ * Play a short cue once: fade in, hold, fade out, then detach the src.
+ *
+ * If autoplay is blocked, we queue a retry for the next user gesture.
  */
 export function playTransition(
   id: SoundId,
@@ -123,7 +159,7 @@ export function playTransition(
     maxDuration?: number;
     /** Seconds to wait before starting playback. */
     delay?: number;
-    /** Playback speed — use slight shifts so layered cues feel distinct. */
+    /** Slight rate shifts help layered cues feel distinct. */
     playbackRate?: number;
   },
 ) {
@@ -147,6 +183,7 @@ export function playTransition(
       } else {
         fadeVolume(audio, volume, fadeIn);
       }
+      // Start fading out so the fade finishes around maxDuration.
       const fadeOutAt =
         Math.max(fadeIn + 0.05, maxDuration - fadeOut) * 1000;
       window.setTimeout(() => {
@@ -169,7 +206,7 @@ export function playTransition(
             void startPlayback(audio)
               .then(beginFades)
               .catch(() => {
-                /* give up silently */
+                /* Browser still blocked audio — fail quietly. */
               });
           });
         });
@@ -185,7 +222,10 @@ export function playTransition(
   }
 }
 
-/** Stage reveals that should not double-fire on React Strict Mode remounts. */
+/**
+ * Like playTransition, but `onceKey` is remembered for the whole session
+ * (until resetAudioSession). Prevents double-fires from Strict Mode remounts.
+ */
 export function playTransitionOnce(
   onceKey: string,
   id: SoundId,
@@ -196,7 +236,10 @@ export function playTransitionOnce(
   playTransition(id, options);
 }
 
-/** Start (or keep) a named looping bed with fade-in. */
+/**
+ * Start (or keep) a looping bed.
+ * If that key is already playing, we only retarget the volume — no restart click.
+ */
 export function playLoop(
   key: string,
   id: SoundId,
@@ -239,7 +282,7 @@ export function playLoop(
   ensure();
 }
 
-/** Fade out and release a looping bed. */
+/** Fade a loop to silence and drop it from the maps. */
 export function stopLoop(
   key: string,
   options?: { fadeOut?: number },
@@ -260,8 +303,8 @@ export function stopLoop(
 }
 
 /**
- * Instant (or soft) volume change on an active loop — used to ride
- * dive progress without restarting the bed.
+ * Instant volume write on a running loop.
+ * Earth Dive uses this every frame so the space bed swells as you near Earth.
  */
 export function setLoopVolume(key: string, volume: number) {
   const audio = loops.get(key);
@@ -271,14 +314,13 @@ export function setLoopVolume(key: string, volume: number) {
   audio.volume = Math.max(0, Math.min(1, volume));
 }
 
-/** Convenience: stop every active loop (e.g. Restart Journey). */
 export function stopAllLoops(options?: { fadeOut?: number }) {
   for (const key of [...loops.keys()]) {
     stopLoop(key, options);
   }
 }
 
-/** Full reset when returning to Intro — loops off, reveals can play again. */
+/** Restart Journey: silence beds and allow intro/space/notebook reveals again. */
 export function resetAudioSession(options?: { fadeOut?: number }) {
   stopAllLoops(options);
   playedOnce.clear();

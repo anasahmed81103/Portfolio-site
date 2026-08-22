@@ -1,3 +1,7 @@
+/**
+ * Live masthead clock. Intl.DateTimeFormat does the locale formatting.
+ * Updates every 30s — enough for a printed “edition time” without a 1s tick.
+ */
 import { useEffect, useState } from 'react';
 
 export type NewspaperClock = {

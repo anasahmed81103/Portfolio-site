@@ -1,3 +1,8 @@
+/**
+ * One newspaper story block: optional headline, dek (subhead), byline, body.
+ * `dropCap` styles the first letter larger (newspaper.css).
+ * `as` lets us render a <section> or <div> when an <article> would be invalid HTML.
+ */
 import type { ReactNode } from 'react';
 
 type ArticleProps = {

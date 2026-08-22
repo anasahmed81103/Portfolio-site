@@ -30,6 +30,18 @@ import {
   stopLoop,
 } from '../../audio/stageAudio';
 
+/**
+ * Everything that lives *inside* the WebGL Canvas for Space + Earth Dive.
+ *
+ * `mode` flips extra systems on (camera controller, flash, cloud flight)
+ * without unmounting Earth / stars / lights.
+ *
+ * Several child components return `null` — they only run `useFrame` logic
+ * (audio volume, handoff, progress smoothing). That is a common R3F pattern.
+ *
+ * `Suspense` waits for useTexture() loads (Milky Way, Earth maps) so we do
+ * not render a missing-texture flash.
+ */
 export type OrbitalMode = 'space' | 'dive';
 
 type OrbitalSceneProps = {
@@ -42,6 +54,7 @@ const NEAR_EARTH_VOL = 0.3;
 const DIVE_VOL = 0.48;
 const FLASH_PEAK_VOL = 0.62;
 
+/** Map dive progress to the space-bed volume (quiet orbit → loud flare). */
 function spaceVolumeForProgress(mode: OrbitalMode, progress: number): number {
   if (mode !== 'dive') return SPACE_VOL;
 
@@ -60,6 +73,7 @@ function spaceVolumeForProgress(mode: OrbitalMode, progress: number): number {
   return DIVE_VOL + t * (FLASH_PEAK_VOL - DIVE_VOL);
 }
 
+/** Watch the flash; fire onBookHandoff once when the screen is fully white. */
 function BookHandoffBridge({ onBookHandoff }: { onBookHandoff?: () => void }) {
   const firedRef = useRef(false);
 

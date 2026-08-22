@@ -1,3 +1,19 @@
+/**
+ * Moves the Three.js camera along the Earth Dive path.
+ *
+ * Two halves, both driven by diveProgressRef (0→1):
+ * 1. Approach (0 → APPROACH_END): Catmull-Rom spline through APPROACH_KEYFRAMES
+ *    — a smooth curve that visits each waypoint without stopping.
+ * 2. Dive (APPROACH_END → 1): straight slide from the hero shot toward the
+ *    glowing limb, never closer than MIN_DIVE_RADIUS so we do not clip Earth.
+ *
+ * Catmull-Rom is a standard interpolation: given four points, it draws a
+ * smooth segment between the middle two. We reuse scratch Vector3s (_pos, …)
+ * so we do not allocate new objects every frame (GC jank).
+ *
+ * `camera.lookAt` aims the lens; `camera.rotateZ(roll)` then banks slightly
+ * so the horizon is not perfectly level (more cinematic).
+ */
 import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { MathUtils, Vector3 } from 'three';
@@ -93,6 +109,7 @@ const MAX_DIVE_TRAVEL = (() => {
   return safe;
 })();
 
+/** Ken Perlin’s smootherstep — extra-soft ease in and out (0→1). */
 function smootherstep01(t: number): number {
   const x = Math.min(1, Math.max(0, t));
   return x * x * x * (x * (x * 6 - 15) + 10);

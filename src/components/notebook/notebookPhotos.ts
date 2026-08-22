@@ -1,6 +1,7 @@
 /**
- * Stand-in newspaper plates in /public/assets/notebook.
- * Swap the files (keep the names) or point these paths at original photos later.
+ * Photo URLs used by newspaper pages.
+ * Files live in public/assets/notebook/ (see SOURCES.md for licenses).
+ * Replace a JPEG but keep the same filename — no code change needed.
  */
 export const notebookPhotos = {
   officeDesk: '/assets/notebook/office-desk.jpg',

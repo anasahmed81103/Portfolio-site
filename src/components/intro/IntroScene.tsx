@@ -12,7 +12,9 @@ type IntroSceneProps = {
 };
 
 /**
- * Notebook intro scene: lined page, doodles, polaroids, signature.
+ * Assembles the intro page pieces. IntroAnimationController wraps them so
+ * one GSAP timeline can find `.intro-doodle`, `.intro-polaroid`, etc. via
+ * CSS class names (see intro.css).
  */
 function IntroScene({ startButton }: IntroSceneProps) {
   return (

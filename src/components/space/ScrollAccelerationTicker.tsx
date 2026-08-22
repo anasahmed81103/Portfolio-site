@@ -5,9 +5,17 @@ import {
 } from '../../hooks/useScrollAcceleration.ts';
 
 /**
- * Runs inside the R3F Canvas.
- * Smoothly eases intensity toward the wheel target and decays when idle.
- * Intensity is signed: + boosts natural spin, − reverses it.
+ * Invisible R3F helper (renders nothing).
+ *
+ * The DOM wheel handler only *pokes* scrollTargetRef. This ticker, running
+ * inside `useFrame`, does the smooth work:
+ * - drain the target back toward 0 when the user stops scrolling
+ * - ease scrollIntensityRef toward that target (exponential blend)
+ *
+ * `1 - Math.exp(-delta * 7)` is a frame-rate-independent lerp: faster machines
+ * do not ease quicker than slower ones.
+ *
+ * Intensity is signed: + boosts Earth’s forward spin, − reverses it (Space).
  */
 function ScrollAccelerationTicker() {
   useFrame((_, delta) => {

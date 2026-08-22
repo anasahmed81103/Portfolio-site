@@ -1,3 +1,12 @@
+/**
+ * Billboard cloud planes that slide past the camera during the limb dive.
+ *
+ * After APPROACH_END, we spawn a few textured quads in front of the camera
+ * and drift them using the same cloud JPEG as the planetary shell.
+ * That sells “we are flying through atmosphere” without a heavy particle sim.
+ *
+ * `useThree` gives us the live camera so planes can stay in front of the lens.
+ */
 import { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';

@@ -9,8 +9,14 @@ import {
 import { planetYawDriveRef } from '../../hooks/planetYawDrive';
 
 /**
- * At hero lock, count real time. First HERO_SPIN_SECONDS: scroll spins Earth.
- * After that, open the gate so scroll advances the dive.
+ * Hero-lock timer — not a visual mesh.
+ *
+ * When dive progress first hits APPROACH_END we start a real-time clock.
+ * For HERO_SPIN_SECONDS, scroll may only spin Earth (gate closed).
+ * Then earthSpinGateOpenRef becomes true and the camera may dive onward.
+ *
+ * planetYawDriveRef is cleared every frame so Earth keeps its own scroll-driven
+ * yaw (the same system as Space). This file only owns the *timer / gate*.
  */
 function EarthDivePlanetSpin() {
   useFrame((_, delta) => {

@@ -1,13 +1,21 @@
+/**
+ * Lights for the orbital scene, plus the “eyes adjusting to space” fade-in.
+ *
+ * GSAP (GreenSock) is the animation library. A `timeline` is a sequence:
+ * “at 2.4s start raising ambient; at 2.65s start raising the Sun.”
+ * Stars (Starfield) are already visible, so Earth appears later — cinematic.
+ *
+ * These lights stay mounted when Space becomes Earth Dive so intensity
+ * does not pop back to zero (no remount).
+ *
+ * `gsap.context` + `ctx.revert()` on cleanup is the official React pattern:
+ * if the component unmounts mid-tween, GSAP kills those tweens.
+ */
 import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import type { AmbientLight, DirectionalLight } from 'three';
 import { SUN_POSITION } from './earthConfig';
 
-/**
- * Staged space entrance: stars shimmer in the dark first;
- * sunlight / ambient ease up much later so Earth resolves gently.
- * Lights stay mounted for the Space → Dive handoff (no remount flash).
- */
 function SpaceVisionReveal() {
   const ambientRef = useRef<AmbientLight>(null);
   const sunRef = useRef<DirectionalLight>(null);
@@ -23,7 +31,6 @@ function SpaceVisionReveal() {
 
       const tl = gsap.timeline({ defaults: { ease: 'sine.inOut' } });
 
-      // Earth waits until stars have already been shimmering awhile.
       tl.to(
         ambient,
         {

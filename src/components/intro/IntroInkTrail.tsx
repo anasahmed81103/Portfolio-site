@@ -22,8 +22,11 @@ type IntroInkTrailProps = {
 };
 
 /**
- * Click-and-drag ink scribbles on the intro page — strokes gently fade away.
- * Canvas stays transparent so diary content underneath is never covered.
+ * Optional scribble layer on the diary (HTML canvas, not Three.js).
+ *
+ * Pointer-down/move records line segments; requestAnimationFrame redraws
+ * them with fading opacity (LIFE_MS). Interactive elements (buttons) are
+ * ignored so you can still click START JOURNEY.
  */
 function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

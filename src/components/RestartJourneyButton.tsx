@@ -19,8 +19,9 @@ function variantForStage(stage: ExperienceStage): string {
 }
 
 /**
- * Top-right escape hatch back to Intro — hidden on the opening diary page.
- * Visual language matches the current stage (HUD / dive / chronicle).
+ * Top-right “Restart Journey” — hidden on Intro.
+ * CSS modifier classes (see app.css) restyle it: cyan HUD in Space,
+ * warm HUD in Dive, paper chip on the newspaper.
  */
 function RestartJourneyButton({ stage, onRestart }: RestartJourneyButtonProps) {
   if (stage === ExperienceStage.Intro) return null;

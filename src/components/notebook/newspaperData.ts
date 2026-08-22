@@ -1,3 +1,10 @@
+/**
+ * Copy and navigation data for the newspaper — edit this file to update
+ * name, links, resume path, and the page list.
+ *
+ * Pages are identified by NewspaperPageId. NotebookExperience maps each id
+ * to a React page component in PAGE_COMPONENTS.
+ */
 export type NewspaperPageId =
   | 'front'
   | 'experience'

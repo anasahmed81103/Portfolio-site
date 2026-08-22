@@ -19,8 +19,14 @@ const _warmWhite = new Color('#fff4e0');
 const _blueWhite = new Color('#eef6ff');
 
 /**
- * Scroll-driven blue-white solar flash — final ~15% of the dive.
- * Camera-locked plane expands to fully opaque before mesh penetration.
+ * Full-screen flash at the end of the dive.
+ *
+ * A plane is parented to the camera each frame (same position/rotation,
+ * a little in front). Opacity and scale follow getFlashT() (0→1).
+ * When it is fully opaque, BookHandoffBridge swaps to the newspaper.
+ *
+ * DoubleSide + depthTest={false} means it always paints on top, even if
+ * Earth geometry is technically closer.
  */
 function SolarFlash() {
   const { camera } = useThree();

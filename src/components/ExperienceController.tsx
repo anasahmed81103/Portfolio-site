@@ -1,3 +1,14 @@
+/**
+ * Stage switcher — picks which full-screen experience to mount.
+ *
+ * Important: Space and Earth Dive share ONE OrbitalExperience (one WebGL Canvas).
+ * If we unmounted Space and mounted a new Dive scene, Earth would flicker black
+ * while Three.js rebuilt the GPU context. Switching only the `stage` prop keeps
+ * the planet, stars, and lights alive.
+ *
+ * `onBookHandoff` is just the name of the callback that leaves orbit for the
+ * newspaper — there is no 3D book stage anymore.
+ */
 import { ExperienceStage } from '../app/experience';
 import IntroExperience from './IntroExperience';
 import OrbitalExperience from './OrbitalExperience';
@@ -20,7 +31,6 @@ function ExperienceController({
         />
       );
 
-    // Same component instance for Space → Earth Dive keeps one Canvas alive.
     case ExperienceStage.Space:
     case ExperienceStage.EarthDive:
       return (

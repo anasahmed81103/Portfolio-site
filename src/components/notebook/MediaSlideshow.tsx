@@ -16,7 +16,10 @@ type MediaSlideshowProps = {
   className?: string;
 };
 
-/** Newspaper photo gallery — auto-advances; prev/next as print controls. */
+/**
+ * Auto-advancing photo plate (used on Projects).
+ * `setInterval` flips slides; prev/next buttons reset the timer.
+ */
 function MediaSlideshow({
   slides,
   intervalMs = 4200,

@@ -1,38 +1,48 @@
+/**
+ * Shared numbers for the Earth Dive chapter.
+ *
+ * diveProgressRef.current is a 0→1 “scrub” driven by the mouse wheel:
+ *
+ *   0 ──────── APPROACH_END (0.5) ──────── FLASH_START (0.85) ──── 1
+ *   camera flies      hero horizon shot      solar flash grows     newspaper
+ *   in from space     (spin-only for a bit)
+ *
+ * Several files import these constants so the camera, sun glow, flash,
+ * and audio all stay on the same timeline.
+ */
 import { diveProgressRef } from '../../hooks/useDiveProgress';
 
-/**
- * Earth Dive phases on diveProgress (0→1):
- * 0 → APPROACH_END     camera to hero horizon
- * hero lock            ~5s spin-only window, then dive unlocks
- * APPROACH_END → 1     dive into glowing right limb → solar flash → Notebook
- */
+/** Progress value where the camera locks on the approved horizon composition. */
 export const APPROACH_END = 0.5;
 
-/** Locked hero composition (approved horizon shot). */
+/** Camera xyz, look-at direction, and slight roll for that hero shot. */
 export const HERO_POSITION = [2.45, 0.32, 2.95] as const;
 export const HERO_LOOK_AT = [0.9, 0.04, -0.7] as const;
 export const HERO_ROLL = 0.05;
 
-/** Seconds of scroll-to-spin at hero before scroll advances the dive. */
+/** After arriving at the hero shot, scroll only spins Earth for this many seconds. */
 export const HERO_SPIN_SECONDS = 2;
 
-/** Final ~15% of dive — blue-white solar flash builds to full cover. */
+/** Last 15% of progress: the blue-white flash that covers the screen. */
 export const FLASH_START = 0.85;
 
-/** Seconds spent at hero lock (counts up toward HERO_SPIN_SECONDS). */
+/** Real time spent sitting on the hero shot (counts up toward HERO_SPIN_SECONDS). */
 export const heroSpinElapsedRef = { current: 0 };
 
-/** True after HERO_SPIN_SECONDS at hero — dive scroll may begin. */
+/** Becomes true after the spin window — then scroll may advance past 0.5. */
 export const earthSpinGateOpenRef = { current: false };
 
-/** 0 at FLASH_START, 1 at dive end — scroll-driven solar flash. */
+/**
+ * How far through the solar flash we are (0 before FLASH_START, 1 at dive end).
+ * Example: progress 0.925 is halfway from 0.85 to 1.0 → flashT = 0.5
+ */
 export function getFlashT(): number {
   const p = diveProgressRef.current;
   if (p <= FLASH_START) return 0;
   return Math.min(1, (p - FLASH_START) / (1 - FLASH_START));
 }
 
-/** True when flash is fully opaque — hand off to Notebook / portfolio stage. */
+/** Flash is essentially full-screen — time to swap to the newspaper. */
 export function isBookHandoffReady(): boolean {
   return getFlashT() >= 0.995;
 }

@@ -21,8 +21,12 @@ const SMOKE_PUFFS = [
 ] as const;
 
 /**
- * Click-triggered intro → space handoff:
- * plane flies L→R with ink blooming just behind it, then the page floods black.
+ * Paper-plane transition from the diary into space.
+ *
+ * GSAP flies the SVG plane left→right, pops ink puffs behind it, then
+ * fades a black overlay. Halfway through we already start the space loop
+ * and space-reveal cue so audio leads the visual cut.
+ * onComplete() tells App to mount OrbitalExperience.
  */
 function IntroSpaceHandoff({ onComplete }: IntroSpaceHandoffProps) {
   const rootRef = useRef<HTMLDivElement>(null);

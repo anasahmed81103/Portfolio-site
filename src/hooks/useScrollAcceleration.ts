@@ -1,11 +1,16 @@
 /**
- * Shared scroll “time acceleration” values.
- * Refs (not React state) so wheel events never re-render the tree.
+ * Shared “scroll makes Earth spin faster / reverse” values.
  *
- * Signed range ≈ [-1, 1]:
- *   + intensifies the natural forward spin
- *   − reverses spin (Space scroll-up)
- * Earth Dive keeps feeding positive values only.
+ * Again: refs, not state — the wheel writes these; Earth.tsx reads them
+ * inside useFrame without asking React to re-render.
+ *
+ * Signed range about [-1, 1]:
+ *   +1  = boosted forward spin (scroll down)
+ *    0  = natural idle spin
+ *   -1  = boosted reverse spin (scroll up, Space only)
+ *
+ * Earth Dive only feeds positive values so the planet never spins backward
+ * during the cinematic descent.
  */
 export const scrollIntensityRef = { current: 0 };
 export const scrollTargetRef = { current: 0 };

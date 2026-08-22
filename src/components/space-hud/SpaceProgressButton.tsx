@@ -10,7 +10,9 @@ type SpaceProgressButtonProps = {
 };
 
 /**
- * Floating sci-fi CTA — appears after a short wait, advances Space → Earth Dive.
+ * “Begin descent” HUD chip. Waits `delayMs` so the visitor can enjoy orbit
+ * first, then calls onProgress (App flips stage to Earth Dive).
+ * Styles live in SpaceHud.css (monospace, cyan glow).
  */
 function SpaceProgressButton({
   onProgress,

@@ -7,9 +7,11 @@ import {
 } from './signaturePaths';
 
 /**
- * Professional script signature (Allura glyph outlines) with sketch draw-in.
- * Letterforms come from the font via scripts/generateSignaturePaths.mjs —
- * not from hand-authored letter approximations.
+ * “Anas Ahmed” as SVG paths taken from the Allura font.
+ *
+ * `npm run generate:signature` reads Allura-Regular.ttf with opentype.js
+ * and writes signaturePaths.ts. GSAP then draws those paths (stroke-dashoffset).
+ * License: src/assets/fonts/OFL-Allura.txt (SIL OFL 1.1).
  */
 function IntroSignature() {
   const { minX, minY, width, height } = SIGNATURE_VIEWBOX;

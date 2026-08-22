@@ -1,3 +1,14 @@
+/**
+ * Thin cloud shell around Earth — another sphere, slightly larger.
+ *
+ * The cloud JPEG has no alpha channel. We treat brightness as opacity:
+ * dark pixels = clear sky, bright pixels = cloud. The `dot(..., 0.299, 0.587, 0.114)`
+ * is the standard luminance formula (how bright a color looks to the eye).
+ *
+ * `transparent` + `depthWrite={false}` lets the planet show through gaps
+ * without fighting the depth buffer (which would make holes look like holes
+ * punched in a solid ball).
+ */
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
@@ -9,7 +20,7 @@ import {
 import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
 import { planetYawDriveRef } from '../../hooks/planetYawDrive';
 
-/** Slightly above the surface so clouds sit in a thin shell, not a second planet. */
+/** A hair larger than Earth so clouds sit in a shell, not z-fighting the surface. */
 const CLOUD_RADIUS = EARTH_RADIUS * 1.012;
 
 const cloudVertexShader = /* glsl */ `
@@ -28,7 +39,6 @@ varying vec2 vUv;
 
 void main() {
   vec3 cloudColor = texture2D(cloudMap, vUv).rgb;
-  // JPG has no alpha — dark = clear sky, bright = cloud (luminance → opacity)
   float alpha = dot(cloudColor, vec3(0.299, 0.587, 0.114));
   alpha = smoothstep(0.05, 0.65, alpha) * 0.55;
 
@@ -51,7 +61,7 @@ function CloudLayer() {
   useFrame((_, delta) => {
     if (!cloudRef.current) return;
 
-    // Lock to Earth yaw during Earth Dive spin; otherwise keep relative drift
+    // Same yaw lock as Earth during dive; slightly faster drift in Space.
     if (planetYawDriveRef.current !== null) {
       cloudRef.current.rotation.y = planetYawDriveRef.current;
     } else {

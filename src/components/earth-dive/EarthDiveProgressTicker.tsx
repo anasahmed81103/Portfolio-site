@@ -6,8 +6,13 @@ import {
 import { APPROACH_END, earthSpinGateOpenRef } from './earthDivePhases';
 
 /**
- * Eases diveProgress toward diveTarget each frame (no React state).
- * While the hero-lock gate is closed, progress never passes APPROACH_END.
+ * Invisible helper: chase diveTarget → diveProgress every frame.
+ *
+ * Wheel events write the *target*. The camera reads the *smoothed* progress,
+ * so the descent does not jerk with every scroll tick.
+ *
+ * While the hero-lock gate is closed, we clamp both values at APPROACH_END
+ * so you cannot skip the spin-Earth window.
  */
 function EarthDiveProgressTicker() {
   useFrame((_, delta) => {

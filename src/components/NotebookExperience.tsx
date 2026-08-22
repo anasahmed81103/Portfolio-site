@@ -30,7 +30,14 @@ const PAGE_COMPONENTS: Record<NewspaperPageId, () => JSX.Element> = {
 };
 
 /**
- * Final portfolio stage — living newspaper revealed after the Earth Dive flare.
+ * Last chapter: a multi-page newspaper (normal React + CSS, not 3D).
+ *
+ * PAGE_COMPONENTS maps each NewspaperPageId to a page component.
+ * Changing `pageId` swaps the article; GSAP slides the sheet out/in so it
+ * feels like a page turn (plus a short page-flip sound).
+ *
+ * A white CSS veil fades out on first mount so the solar flash continues
+ * smoothly into paper.
  */
 function NotebookExperience() {
   const rootRef = useRef<HTMLDivElement>(null);

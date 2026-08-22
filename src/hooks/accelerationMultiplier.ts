@@ -1,11 +1,11 @@
 /**
- * Maps scroll intensity to a rotation-speed multiplier.
+ * Turns scroll intensity into a spin-speed multiplier for Earth / clouds.
  *
- * intensity  0 → 1 (natural forward spin)
- * intensity  1 → maxMultiplier (boosted forward)
- * intensity -1 → -maxMultiplier (boosted reverse)
+ * intensity  0 → 1              (natural forward speed)
+ * intensity  1 → maxMultiplier  (fastest forward)
+ * intensity -1 → -maxMultiplier (fastest reverse)
  *
- * Negative intensity flips direction immediately so scroll-up feels responsive.
+ * Negative intensity flips direction immediately so scroll-up feels instant.
  */
 export function accelerationMultiplier(
   intensity: number,

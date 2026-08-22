@@ -1,3 +1,20 @@
+/**
+ * Procedural starfield — three layers of GPU “points” (tiny sprites).
+ *
+ * How it works:
+ * 1. createStarLayer() scatters thousands of points on a sphere (random radius).
+ *    Positions use spherical coordinates: radius, theta (around), phi (up/down).
+ * 2. Each star stores a phase + speed so they twinkle out of sync.
+ * 3. Every frame we rewrite the color attribute (brightness) — that is the twinkle.
+ * 4. Layers slowly rotate; scroll intensity speeds that drift and the sparkle.
+ *
+ * Three.js `Points` + `pointsMaterial` = one draw call per layer (cheap).
+ * AdditiveBlending makes overlapping stars glow instead of looking like grey dots.
+ *
+ * BufferGeometry = a bag of typed arrays the GPU can read. We keep extra
+ * Float32Arrays on the CPU (phases, speeds) that are NOT uploaded — only
+ * position + color go to the GPU.
+ */
 import { useMemo, useRef, type RefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import {
@@ -10,10 +27,6 @@ import {
 import { useScrollAcceleration } from '../../hooks/useScrollAcceleration.ts';
 import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
 
-/**
- * One unified starfield: small / medium / large all share the same twinkle system.
- * Replaces the old Drei Stars + separate TwinklingStars split.
- */
 type StarLayerData = {
   geometry: BufferGeometry;
   phases: Float32Array;
@@ -40,6 +53,7 @@ type LayerConfig = {
   driftBase: number;
 };
 
+/** Scatter `count` stars and give each its own twinkle / flare personality. */
 function createStarLayer(config: LayerConfig): StarLayerData {
   const { count } = config;
   const positions = new Float32Array(count * 3);
@@ -52,6 +66,7 @@ function createStarLayer(config: LayerConfig): StarLayerData {
   const flareSpeeds = new Float32Array(count);
 
   for (let i = 0; i < count; i += 1) {
+    // Uniform-ish points on a sphere (avoid clustering at the poles).
     const radius = config.radiusMin + Math.random() * config.radiusRange;
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(2 * Math.random() - 1);
@@ -92,6 +107,7 @@ function createStarLayer(config: LayerConfig): StarLayerData {
   };
 }
 
+/** Rewrite each star’s RGB from sine waves. `colorAttr.needsUpdate` tells the GPU. */
 function updateLayerTwinkle(
   layer: StarLayerData,
   time: number,

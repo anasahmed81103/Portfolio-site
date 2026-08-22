@@ -1,3 +1,7 @@
+/**
+ * Masthead (front page) or compact interior header.
+ * Pulls chronicle name / edition from newspaperData and the live clock hook.
+ */
 import { CHRONICLE_NAME, EDITION_META } from './newspaperData';
 import useNewspaperClock from './useNewspaperClock';
 

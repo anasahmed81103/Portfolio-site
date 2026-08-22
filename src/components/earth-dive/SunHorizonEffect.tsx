@@ -12,6 +12,17 @@ import { EARTH_RADIUS, SUN_POSITION } from '../space/earthConfig';
 import { diveProgressRef } from '../../hooks/useDiveProgress';
 import { APPROACH_END, getFlashT, HERO_POSITION } from './earthDivePhases';
 
+/**
+ * Cinematic Sun + horizon bloom for Earth Dive only.
+ *
+ * Sprites (always-face-camera quads) are textured with a radial gradient we
+ * paint on an offscreen 2D canvas (`createGlowTexture`). No extra image files.
+ *
+ * Strength is based on how close the *camera* is to the hero shot, not raw
+ * scroll — so the sun grows as we approach, then the later flash takes over.
+ *
+ * AdditiveBlending = light stacks ( overlapping glows get brighter ).
+ */
 /** Soft procedural glow — no external image assets. */
 function createGlowTexture(
   stops: readonly (readonly [number, string])[],
