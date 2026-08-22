@@ -12,6 +12,7 @@ import OrbitalScene from './space/OrbitalScene';
 import SpaceScrollHint from './space-hud/SpaceScrollHint';
 import SpaceProgressButton from './space-hud/SpaceProgressButton';
 import EarthSpinHint from './space-hud/EarthSpinHint';
+import SpaceCursor from './space/SpaceCursor';
 import {
   scrollIntensityRef,
   scrollTargetRef,
@@ -264,6 +265,7 @@ function OrbitalExperience({
       {!isDive && onProgressToDive ? (
         <SpaceProgressButton onProgress={handleProgress} exiting={exiting} />
       ) : null}
+      <SpaceCursor rootRef={containerRef} />
     </div>
   );
 }

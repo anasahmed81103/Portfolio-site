@@ -2,6 +2,7 @@ import { useCallback, useRef, useState, type ReactNode } from 'react';
 import IntroScene from './intro/IntroScene';
 import IntroStartButton from './intro/IntroStartButton';
 import IntroSpaceHandoff from './intro/IntroSpaceHandoff';
+import IntroCursor from './intro/IntroCursor';
 
 type IntroExperienceProps = {
   onSpaceHandoff?: () => void;
@@ -12,6 +13,7 @@ type IntroExperienceProps = {
  * Space is reached only via the paper “START JOURNEY” handoff.
  */
 function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [handingOff, setHandingOff] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
   const lockedRef = useRef(false);
@@ -39,11 +41,12 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   );
 
   return (
-    <div className="intro-experience">
+    <div ref={rootRef} className="intro-experience">
       <IntroScene startButton={startButton} />
       {handingOff ? (
         <IntroSpaceHandoff onComplete={handleHandoffComplete} />
       ) : null}
+      <IntroCursor rootRef={rootRef} />
     </div>
   );
 }

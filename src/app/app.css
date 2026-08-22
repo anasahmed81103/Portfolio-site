@@ -17,6 +17,49 @@
   height: 100%;
 }
 
+/* Crescent moon / star cursor — Space & Earth Dive */
+.space-experience.space-fine-pointer,
+.space-experience.space-fine-pointer * {
+  cursor: none !important;
+}
+
+.space-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px rgba(180, 220, 255, 0.55));
+}
+
+.space-cursor svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  overflow: visible;
+}
+
+.space-cursor-moon {
+  transform: translate(-14px, -16px);
+}
+
+.space-cursor-star {
+  transform: translate(-14px, -14px);
+  filter: drop-shadow(0 0 8px rgba(255, 246, 200, 0.9));
+}
+
+.space-cursor[data-mode='moon'] .space-cursor-moon {
+  display: block;
+}
+
+.space-cursor[data-mode='star'] .space-cursor-star {
+  display: block;
+}
+
 /* Vision-clearing overlay: solid black lifts so stars bloom, soft edge lasts longer */
 .space-vision-veil {
   position: absolute;

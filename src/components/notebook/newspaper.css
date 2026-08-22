@@ -42,24 +42,12 @@
   position: absolute;
   top: 0;
   left: 0;
-  display: none;
+  display: block;
   overflow: visible;
 }
 
 .np-cursor-lens {
   transform: translate(-11px, -11px);
-}
-
-.np-cursor-pen {
-  transform: translate(-30px, -30px);
-}
-
-.np-cursor[data-mode='read'] .np-cursor-lens {
-  display: block;
-}
-
-.np-cursor[data-mode='write'] .np-cursor-pen {
-  display: block;
 }
 
 .notebook-flash-veil {

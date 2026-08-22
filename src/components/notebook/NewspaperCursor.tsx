@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 
 const FINE_POINTER = '(hover: hover) and (pointer: fine)';
-const INTERACTIVE = 'a, button, [role="button"], input, textarea, label, summary';
 
 type NewspaperCursorProps = {
   rootRef: RefObject<HTMLDivElement | null>;
 };
 
 /**
- * Reading glass over the page; fountain pen on links and buttons.
+ * Magnifying glass over the chronicle — one style throughout.
  * Fine pointers only — phones keep the native cursor.
  */
 function NewspaperCursor({ rootRef }: NewspaperCursorProps) {
@@ -33,11 +32,6 @@ function NewspaperCursor({ rootRef }: NewspaperCursorProps) {
     const onMove = (event: PointerEvent) => {
       cursor.style.opacity = '1';
       cursor.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
-
-      const overUi =
-        event.target instanceof Element &&
-        Boolean(event.target.closest(INTERACTIVE));
-      cursor.dataset.mode = overUi ? 'write' : 'read';
     };
 
     const onLeave = () => {
@@ -56,12 +50,7 @@ function NewspaperCursor({ rootRef }: NewspaperCursorProps) {
   if (!enabled) return null;
 
   return (
-    <div
-      ref={cursorRef}
-      className="np-cursor"
-      data-mode="read"
-      aria-hidden="true"
-    >
+    <div ref={cursorRef} className="np-cursor" aria-hidden="true">
       <svg
         className="np-cursor-lens"
         viewBox="0 0 32 32"
@@ -86,20 +75,6 @@ function NewspaperCursor({ rootRef }: NewspaperCursorProps) {
           strokeWidth="3.1"
           strokeLinecap="round"
         />
-      </svg>
-
-      <svg
-        className="np-cursor-pen"
-        viewBox="0 0 32 32"
-        width="32"
-        height="32"
-      >
-        <path
-          d="M30 30 L25 30.8 L6 11.8 L10.8 7 Z"
-          fill="currentColor"
-        />
-        <path d="M30 30 L24.5 25.8 L26.2 24.2 L30.8 28.8 Z" fill="#8f3d36" />
-        <path d="M10.8 7 L6 11.8 L1.5 1.5 L10.8 7 Z" fill="currentColor" />
       </svg>
     </div>
   );

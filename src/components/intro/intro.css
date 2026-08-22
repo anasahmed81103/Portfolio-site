@@ -487,3 +487,43 @@
   color: #1a1510;
   will-change: transform, opacity;
 }
+
+/* Quill cursor — diary intro */
+.intro-experience.intro-fine-pointer,
+.intro-experience.intro-fine-pointer * {
+  cursor: none !important;
+}
+
+.intro-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 1px 1px rgba(255, 252, 245, 0.85));
+}
+
+.intro-cursor svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  overflow: visible;
+}
+
+.intro-cursor-feather,
+.intro-cursor-ink {
+  /* Tip near the pointer hotspot */
+  transform: translate(-3px, -33px);
+}
+
+.intro-cursor[data-mode='feather'] .intro-cursor-feather {
+  display: block;
+}
+
+.intro-cursor[data-mode='ink'] .intro-cursor-ink {
+  display: block;
+}
