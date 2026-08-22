@@ -110,15 +110,7 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
       drawingRef.current = true;
       pointerIdRef.current = event.pointerId;
       lastRef.current = pointFromEvent(event);
-      // Mouse only — capture on iOS/Android often never releases, so the
-      // first tap locks the page. Window listeners below end the stroke.
-      if (event.pointerType === 'mouse') {
-        try {
-          canvas.setPointerCapture(event.pointerId);
-        } catch {
-          /* some browsers reject capture */
-        }
-      }
+      canvas.setPointerCapture(event.pointerId);
     };
 
     const onMove = (event: PointerEvent) => {
@@ -156,10 +148,6 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
       endStroke();
     };
 
-    const onTouchEnd = () => {
-      endStroke();
-    };
-
     const tick = (now: number) => {
       const w = root.clientWidth;
       const h = root.clientHeight;
@@ -192,12 +180,6 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
     canvas.addEventListener('pointerup', onUp);
     canvas.addEventListener('pointercancel', onUp);
     canvas.addEventListener('lostpointercapture', onUp);
-    // Real phones often skip canvas pointerup; window/touch always fires.
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
-    window.addEventListener('touchend', onTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
-    window.addEventListener('blur', endStroke);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
@@ -206,11 +188,6 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
       canvas.removeEventListener('pointerup', onUp);
       canvas.removeEventListener('pointercancel', onUp);
       canvas.removeEventListener('lostpointercapture', onUp);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
-      window.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('touchcancel', onTouchEnd);
-      window.removeEventListener('blur', endStroke);
       endStroke();
       segmentsRef.current = [];
       ctx.clearRect(0, 0, root.clientWidth, root.clientHeight);
