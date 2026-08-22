@@ -11,8 +11,7 @@ type IntroExperienceProps = {
 };
 
 /**
- * Intro stage shell — mirrors SpaceExperience / EarthDiveExperience.
- * Space is reached only via the paper “START JOURNEY” handoff.
+ * Intro stage shell. Space is reached only via the paper “START JOURNEY” handoff.
  */
 function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);

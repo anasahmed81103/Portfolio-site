@@ -25,13 +25,6 @@ export const heroSpinElapsedRef = { current: 0 };
 /** True after HERO_SPIN_SECONDS at hero — dive scroll may begin. */
 export const earthSpinGateOpenRef = { current: false };
 
-/** How far through the limb dive (0 before dive, 1 at end). */
-export function getAtmosphereEntryT(): number {
-  const p = diveProgressRef.current;
-  if (p <= APPROACH_END) return 0;
-  return Math.min(1, (p - APPROACH_END) / (1 - APPROACH_END));
-}
-
 /** 0 at FLASH_START, 1 at dive end — scroll-driven solar flash. */
 export function getFlashT(): number {
   const p = diveProgressRef.current;

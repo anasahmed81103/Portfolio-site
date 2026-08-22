@@ -33,7 +33,6 @@ A **Restart Journey** control (top-right, hidden on Intro) returns to the beginn
 | Bundler | Vite 8 |
 | 3D | Three.js, React Three Fiber, Drei |
 | Motion | GSAP |
-| Debug (optional) | Leva — available as a dependency; not required for the public experience |
 | Audio | Web Audio helpers in `src/audio/` |
 
 No backend, database, or auth. Content is static React/HTML/CSS for the notebook so it stays easy to update and accessible.
@@ -79,7 +78,6 @@ public/
   assets/
     notebook/          # Newspaper photographs + SOURCES.md
     sounds/            # Stage SFX / beds + SOURCES.md
-    earth-dive/        # Optional / unused dive assets
   textures/
     earth/             # Day, night, clouds, milky way maps
   resume anas ahmed.pdf
@@ -154,11 +152,9 @@ Third-party media must keep their licenses. Primary records:
 
 ### Earth & sky textures
 
-Active maps under `public/textures/earth/`:
+Maps under `public/textures/earth/`:
 
 - `earth-day.jpg`, `earth-night.jpg`, `earth-clouds.jpg`, `milky-way.jpg`
-
-Also present (not currently wired in code): `public/textures/2k_earth_normal_map.tif`, `public/textures/2k_earth_specular_map.tif`.
 
 **Source:** [Solar System Scope — Solar Textures](https://www.solarsystemscope.com/textures/)  
 **License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (attribution required)
@@ -183,15 +179,6 @@ All stage sounds are from [Pixabay](https://pixabay.com/), under the
 (free for commercial use; attribution not required). Recorded in
 [`public/assets/sounds/SOURCES.md`](public/assets/sounds/SOURCES.md).
 
-### Unused / optional files
-
-| Path | Notes |
-| --- | --- |
-| `public/assets/earth-dive/earth-cloudscape.exr` | On disk; not loaded by current code (sun flare is procedural) |
-| `public/textures/2k_earth_*.tif` | Solar System Scope extras; unused by shaders today |
-
-Remove unused binaries from the repo if you want a smaller clone, or keep them and document them as above.
-
 ### Your original work
 
 Original code, notebook layout, CrossViewNet plates, and any self-authored writing/audio remain yours. Add a root `LICENSE` if you want to clarify reuse of the **source code** (separate from third-party asset licenses).
@@ -209,7 +196,6 @@ Original code, notebook layout, CrossViewNet plates, and any self-authored writi
 
 ## Development notes
 
-- Temporary stage-jump debug buttons were removed for the finished experience.  
 - Prefer editing content in the notebook data/pages files rather than hard-coding copy in layout components.  
 - When adding assets: keep filenames stable or update the path maps, and **always** record source + license next to the asset folder.
 

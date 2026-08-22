@@ -34,8 +34,6 @@ export type OrbitalMode = 'space' | 'dive';
 
 type OrbitalSceneProps = {
   mode: OrbitalMode;
-  /** When true, lights start at full intensity (debug jump straight into dive). */
-  skipVisionReveal?: boolean;
   onBookHandoff?: () => void;
 };
 
@@ -133,7 +131,6 @@ function NotebookRevealAudioBridge() {
  */
 function OrbitalScene({
   mode,
-  skipVisionReveal = false,
   onBookHandoff,
 }: OrbitalSceneProps) {
   const isDive = mode === 'dive';
@@ -146,7 +143,7 @@ function OrbitalScene({
         <ScrollAccelerationTicker />
       )}
 
-      <SpaceVisionReveal skipEntrance={skipVisionReveal} />
+      <SpaceVisionReveal />
       <SpaceDiveVolumeBridge mode={mode} />
 
       {isDive ? (

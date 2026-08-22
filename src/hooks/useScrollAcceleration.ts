@@ -4,7 +4,7 @@
  *
  * Signed range ≈ [-1, 1]:
  *   + intensifies the natural forward spin
- *   − reverses spin (SpaceExperience scroll-up)
+ *   − reverses spin (Space scroll-up)
  * Earth Dive keeps feeding positive values only.
  */
 export const scrollIntensityRef = { current: 0 };

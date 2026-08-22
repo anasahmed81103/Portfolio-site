@@ -627,22 +627,6 @@
   line-height: 1.4;
 }
 
-/* ---------- About ---------- */
-
-.np-about-layout {
-  display: grid;
-  gap: 1.25rem;
-}
-
-.np-about-copy {
-  display: grid;
-  gap: 1rem;
-}
-
-.np-about-note {
-  margin-top: 0.5rem;
-}
-
 /* ---------- Experience ---------- */
 
 .np-experience-layout {
@@ -1179,11 +1163,6 @@
     padding-left: 0;
   }
 
-  .np-about-layout {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
-    align-items: start;
-  }
-
   .np-experience-layout {
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.75fr);
     align-items: start;
@@ -1253,7 +1232,6 @@
   }
 
   .np-front-note,
-  .np-about-note,
   .np-projects-note {
     position: static;
     transform: rotate(-1deg);
