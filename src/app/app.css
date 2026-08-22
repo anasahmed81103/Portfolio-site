@@ -127,3 +127,100 @@ nav {
 nav button {
   cursor: pointer;
 }
+
+/* Restart Journey — top right, restyles per stage (hidden on Intro) */
+.restart-journey {
+  position: fixed;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 30;
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.restart-journey:hover {
+  opacity: 0.92;
+}
+
+.restart-journey:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* Space — cyan HUD chip */
+.restart-journey--space {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9af5ff;
+  border-color: rgba(126, 240, 255, 0.4);
+  border-radius: 4px;
+  background: rgba(4, 16, 28, 0.55);
+  box-shadow:
+    0 0 14px rgba(60, 200, 255, 0.22),
+    inset 0 0 10px rgba(126, 240, 255, 0.06);
+  text-shadow:
+    0 0 8px rgba(126, 240, 255, 0.85),
+    0 0 18px rgba(80, 200, 255, 0.4);
+}
+
+.restart-journey--space:hover {
+  background: rgba(8, 28, 44, 0.75);
+  border-color: rgba(126, 240, 255, 0.65);
+}
+
+/* Earth Dive — warmer sun-flare HUD */
+.restart-journey--dive {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffe2b0;
+  border-color: rgba(255, 196, 120, 0.45);
+  border-radius: 4px;
+  background: rgba(28, 14, 6, 0.55);
+  box-shadow:
+    0 0 16px rgba(255, 160, 60, 0.28),
+    inset 0 0 10px rgba(255, 200, 120, 0.08);
+  text-shadow:
+    0 0 8px rgba(255, 200, 120, 0.9),
+    0 0 18px rgba(255, 140, 40, 0.45);
+}
+
+.restart-journey--dive:hover {
+  background: rgba(40, 18, 8, 0.72);
+  border-color: rgba(255, 210, 140, 0.7);
+}
+
+/* Notebook — printed paper chip */
+.restart-journey--notebook {
+  font-family: 'Libre Baskerville', 'Times New Roman', serif;
+  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1a1510;
+  border: 1.5px solid rgba(26, 21, 16, 0.55);
+  border-radius: 1px;
+  background: rgba(239, 230, 212, 0.92);
+  box-shadow:
+    1px 1px 0 rgba(26, 21, 16, 0.12),
+    0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.restart-journey--notebook:hover {
+  background: #f5efe4;
+  box-shadow:
+    2px 2px 0 rgba(26, 21, 16, 0.14),
+    0 8px 18px rgba(0, 0, 0, 0.2);
+}

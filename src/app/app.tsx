@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ExperienceStage } from './experience';
 import ExperienceController from '../components/ExperienceController';
+import RestartJourneyButton from '../components/RestartJourneyButton';
 import './app.css';
 
 function App() {
@@ -13,6 +14,11 @@ function App() {
       <ExperienceController
         stage={currentStage}
         onStageChange={setCurrentStage}
+      />
+
+      <RestartJourneyButton
+        stage={currentStage}
+        onRestart={() => setCurrentStage(ExperienceStage.Intro)}
       />
 
       <nav>
