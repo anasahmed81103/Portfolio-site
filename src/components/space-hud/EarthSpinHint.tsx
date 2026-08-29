@@ -20,8 +20,8 @@ function EarthSpinHint({ touchCopy = false }: EarthSpinHintProps) {
 
     const tick = () => {
       const p = diveProgressRef.current;
-      // Show once approach begins; hide as soon as the limb dive starts.
-      const next = p > 0.01 && p <= APPROACH_END + 0.0001;
+      // Approach only — at the hero shot the progress button takes over.
+      const next = p > 0.01 && p < APPROACH_END - 0.0001;
       setVisible((prev) => (prev === next ? prev : next));
       raf = requestAnimationFrame(tick);
     };

@@ -5,7 +5,7 @@
  *
  *   0 ──────── APPROACH_END (0.5) ──────── FLASH_START (0.85) ──── 1
  *   camera flies      hero horizon shot      solar flash grows     newspaper
- *   in from space     (spin-only for a bit)
+ *   in from space     (spin until progress_forward)
  *
  * Several files import these constants so the camera, sun glow, flash,
  * and audio all stay on the same timeline.
@@ -54,16 +54,13 @@ export function getHeroLookAt(): [number, number, number] {
   ];
 }
 
-/** After arriving at the hero shot, scroll only spins Earth for this many seconds. */
-export const HERO_SPIN_SECONDS = 2;
-
 /** Last 15% of progress: the blue-white flash that covers the screen. */
 export const FLASH_START = 0.85;
 
-/** Real time spent sitting on the hero shot (counts up toward HERO_SPIN_SECONDS). */
-export const heroSpinElapsedRef = { current: 0 };
-
-/** Becomes true after the spin window — then scroll may advance past 0.5. */
+/**
+ * Closed at the hero shot so scroll only spins Earth.
+ * The HUD progress button opens it — then scroll may advance past 0.5.
+ */
 export const earthSpinGateOpenRef = { current: false };
 
 /**

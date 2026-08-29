@@ -12,7 +12,7 @@ import {
 /**
  * Same job as ScrollAccelerationTicker, tuned for Earth Dive:
  * - target is forced ≥ 0 (no reverse spin during the cinematic)
- * - while stuck in the hero spin window, decay is slower and easing is snappier
+ * - while the hero spin gate is closed, decay is slower and easing is snappier
  *   so scroll-to-spin feels punchy
  */
 function EarthDiveScrollAccelerationTicker() {

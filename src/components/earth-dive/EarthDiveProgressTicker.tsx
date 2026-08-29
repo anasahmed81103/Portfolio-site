@@ -12,7 +12,7 @@ import { APPROACH_END, earthSpinGateOpenRef } from './earthDivePhases';
  * so the descent does not jerk with every scroll tick.
  *
  * While the hero-lock gate is closed, we clamp both values at APPROACH_END
- * so you cannot skip the spin-Earth window.
+ * so scroll cannot skip the spin-Earth beat (the HUD button opens the gate).
  */
 function EarthDiveProgressTicker() {
   useFrame((_, delta) => {

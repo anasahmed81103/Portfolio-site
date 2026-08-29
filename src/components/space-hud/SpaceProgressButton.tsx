@@ -7,25 +7,40 @@ type SpaceProgressButtonProps = {
   delayMs?: number;
   /** Soft exit while Space → Dive handoff runs. */
   exiting?: boolean;
+  /**
+   * When false the chip stays hidden and the delay restarts next time it
+   * becomes true. Space is always armed; Earth Dive arms at the hero lock.
+   */
+  armed?: boolean;
+  ariaLabel?: string;
 };
 
 /**
  * “Begin descent” HUD chip. Waits `delayMs` so the visitor can enjoy orbit
- * first, then calls onProgress (App flips stage to Earth Dive).
+ * first, then calls onProgress.
  * Styles live in SpaceHud.css (monospace, cyan glow).
  */
 function SpaceProgressButton({
   onProgress,
   delayMs = 5000,
   exiting = false,
+  armed = true,
+  ariaLabel = 'Progress forward to Earth dive',
 }: SpaceProgressButtonProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (exiting) return;
+    if (exiting || !armed) {
+      setVisible(false);
+      return;
+    }
+    if (delayMs <= 0) {
+      setVisible(true);
+      return;
+    }
     const id = window.setTimeout(() => setVisible(true), delayMs);
     return () => window.clearTimeout(id);
-  }, [delayMs, exiting]);
+  }, [delayMs, exiting, armed]);
 
   const shown = visible && !exiting;
 
@@ -38,7 +53,7 @@ function SpaceProgressButton({
       tabIndex={shown ? 0 : -1}
       aria-hidden={!shown}
       disabled={exiting}
-      aria-label="Progress forward to Earth dive"
+      aria-label={ariaLabel}
     >
       <span className="space-progress-button-bracket" aria-hidden="true">
         [

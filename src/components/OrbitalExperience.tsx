@@ -31,7 +31,6 @@ import {
 import {
   APPROACH_END,
   earthSpinGateOpenRef,
-  heroSpinElapsedRef,
 } from './earth-dive/earthDivePhases';
 import { planetYawDriveRef } from '../hooks/planetYawDrive';
 import { prefersReducedGpu, useTouchLayout } from '../hooks/useTouchLayout';
@@ -39,7 +38,7 @@ import { prefersReducedGpu, useTouchLayout } from '../hooks/useTouchLayout';
 /** Slower scrub while closing in from space — soft, cinematic approach. */
 const APPROACH_WHEEL_SCALE = 0.00028;
 
-/** Dive / flash scrub (after hero lock timer). */
+/** Dive / flash scrub (after the hero HUD button opens the gate). */
 const DIVE_WHEEL_SCALE = 0.00055;
 
 /** Wheel burst while waiting in the hero spin window. */
@@ -120,7 +119,7 @@ type OrbitalExperienceProps = {
  * Wheel + vertical swipe listeners live here (DOM), not in Three.js:
  * - Space: scroll/swipe pokes scrollTargetRef (planet spin / reverse)
  * - Dive: the same input also advances diveTargetRef (camera path), with
- *   special rules at the hero-lock spin window
+ *   a spin-only hold at the hero shot until the visitor presses progress_forward
  *
  * The dark “vision veil” is a CSS overlay GSAP fades out as space appears.
  */
@@ -134,6 +133,8 @@ function OrbitalExperience({
   const veilRef = useRef<HTMLDivElement>(null);
   const lockedRef = useRef(false);
   const [exiting, setExiting] = useState(false);
+  const [atHeroShot, setAtHeroShot] = useState(false);
+  const [diveAdvancing, setDiveAdvancing] = useState(false);
 
   const isDive = stage === ExperienceStage.EarthDive;
   const touchLayout = useTouchLayout();
@@ -147,6 +148,30 @@ function OrbitalExperience({
     // HUD only — 3D view stays live; stage flip happens in the same Canvas.
     window.setTimeout(() => onProgressToDive(), 850);
   }, [onProgressToDive, isDive]);
+
+  const handleDiveAdvance = useCallback(() => {
+    if (diveAdvancing || earthSpinGateOpenRef.current) return;
+    earthSpinGateOpenRef.current = true;
+    setDiveAdvancing(true);
+  }, [diveAdvancing]);
+
+  // Hero-shot detector — the dive chip arms the moment the camera locks.
+  useEffect(() => {
+    if (!isDive) {
+      setAtHeroShot(false);
+      setDiveAdvancing(false);
+      return;
+    }
+
+    let raf = 0;
+    const tick = () => {
+      const at = diveProgressRef.current >= APPROACH_END - 0.0001;
+      setAtHeroShot((prev) => (prev === at ? prev : at));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isDive]);
 
   // Space entrance veil — Canvas stays mounted across Space → Dive.
   useLayoutEffect(() => {
@@ -313,7 +338,6 @@ function OrbitalExperience({
       unbindSwipe?.();
       diveTargetRef.current = 0;
       diveProgressRef.current = 0;
-      heroSpinElapsedRef.current = 0;
       earthSpinGateOpenRef.current = false;
       planetYawDriveRef.current = null;
       scrollTargetRef.current = 0;
@@ -352,21 +376,34 @@ function OrbitalExperience({
       <SpaceScrollHint
         label={
           isDive
-            ? touchLayout
-              ? 'swipe down'
-              : 'scroll down'
+            ? atHeroShot && !diveAdvancing
+              ? touchLayout
+                ? 'swipe'
+                : 'scroll'
+              : touchLayout
+                ? 'swipe down'
+                : 'scroll down'
             : touchLayout
               ? 'swipe'
               : 'scroll'
         }
-        showArrow={isDive}
+        showArrow={isDive && (!atHeroShot || diveAdvancing)}
       />
       {isDive ? <EarthSpinHint touchCopy={touchLayout} /> : null}
       {!isDive && onProgressToDive ? (
         <SpaceProgressButton
           onProgress={handleProgress}
           exiting={exiting}
-          delayMs={5000}
+          delayMs={0}
+        />
+      ) : null}
+      {isDive ? (
+        <SpaceProgressButton
+          onProgress={handleDiveAdvance}
+          exiting={diveAdvancing}
+          delayMs={0}
+          armed={atHeroShot && !diveAdvancing}
+          ariaLabel="Progress forward to enter Earth"
         />
       ) : null}
       <SpaceCursor rootRef={containerRef} />
