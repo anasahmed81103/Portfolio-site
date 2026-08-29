@@ -91,8 +91,8 @@ function FrontPage() {
             <p className="np-teaser-kicker">Page 4</p>
             <h4 className="np-teaser-title">Honors &amp; Certifications</h4>
             <p className="np-teaser-text">
-              FAST-NUCES standing, Dean’s List, UTeM summer school, and
-              official certifications.
+              FAST-NUCES standing, Dean’s and Rector’s Lists, UTeM summer
+              school, and official certifications.
             </p>
           </article>
           <article className="np-teaser">

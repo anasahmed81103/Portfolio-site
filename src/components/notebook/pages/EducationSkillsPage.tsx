@@ -97,9 +97,9 @@ function EducationSkillsPage() {
           </p>
           <p>
             National standing: <strong>99.8th percentile</strong> on the HEC
-            &amp; P@SHA Skill Competency Test — the top 0.2% nationwide. Seven
-            appearances on the Dean’s List of Honors. President of the Youth
-            Intelligentsia FAST Chapter.
+            &amp; P@SHA Skill Competency Test — the top 0.2% nationwide. Six
+            times on the Dean’s List, and once on the Rector’s List of Honors.
+            President of the Youth Intelligentsia FAST Chapter.
           </p>
           <div className="np-education-facts">
             <div>
@@ -112,7 +112,7 @@ function EducationSkillsPage() {
             </div>
             <div>
               <p className="np-fact-label">Honors</p>
-              <p className="np-fact-value">Dean’s List × 7</p>
+              <p className="np-fact-value">Dean’s × 6 · Rector’s × 1</p>
             </div>
           </div>
         </Article>
@@ -125,7 +125,7 @@ function EducationSkillsPage() {
             caption="FAST-NUCES — four years, in one photograph."
             credit={STAND_IN_CREDIT}
           />
-          <HandAnnotation>seven times on the list</HandAnnotation>
+          <HandAnnotation>6× dean, rector once</HandAnnotation>
         </aside>
       </div>
 
