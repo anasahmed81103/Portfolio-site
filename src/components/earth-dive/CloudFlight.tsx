@@ -20,6 +20,7 @@ import {
 } from 'three';
 import { diveProgressRef } from '../../hooks/useDiveProgress';
 import { APPROACH_END } from './earthDivePhases';
+import { EARTH_TEXTURES } from '../../preload/sessionAssets';
 
 function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
@@ -131,7 +132,7 @@ const _pos = new Vector3();
  */
 function CloudFlight() {
   const { camera } = useThree();
-  const cloudMap = useTexture('/textures/earth/earth-clouds.jpg');
+  const cloudMap = useTexture(EARTH_TEXTURES.clouds);
   const hazeRef = useRef<Mesh>(null);
   const meshRefs = useRef<(Mesh | null)[]>(LAYERS.map(() => null));
   const phasesRef = useRef(LAYERS.map((_, i) => i * 1.17));

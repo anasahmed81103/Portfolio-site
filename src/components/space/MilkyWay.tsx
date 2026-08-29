@@ -13,6 +13,7 @@
 import { useTexture } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { LinearFilter, SRGBColorSpace, type Texture } from 'three';
+import { EARTH_TEXTURES } from '../../preload/sessionAssets';
 
 const BACKDROP_Z = -42;
 /** Extra scale so edges never peek through on resize / ultrawide. */
@@ -29,7 +30,7 @@ function configureMilkyWayTexture(texture: Texture) {
 
 function MilkyWay() {
   const milkyWayMap = useTexture(
-    '/textures/earth/milky-way.jpg',
+    EARTH_TEXTURES.milkyWay,
     configureMilkyWayTexture,
   );
 

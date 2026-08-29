@@ -1,0 +1,206 @@
+/* Session boot — same cream ruled page as the intro, so the handoff is quiet. */
+
+.boot-screen {
+  --boot-ink: #2b241c;
+  --boot-p: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--boot-ink);
+  opacity: 1;
+  transition: opacity 0.42s ease;
+}
+
+.boot-screen--leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boot-page {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  --line-gap: 2rem;
+  --margin-inset: clamp(3.5rem, 12vw, 7rem);
+  --line-offset: 3.25rem;
+  background-color: #f4efe6;
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(210, 195, 170, 0.35), transparent 50%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--line-gap) - 1px),
+      #b8c4d4 calc(var(--line-gap) - 1px),
+      #b8c4d4 var(--line-gap)
+    );
+  background-size: auto, auto, 100% var(--line-gap);
+  background-position: 0 0, 0 0, 0 var(--line-offset);
+}
+
+.boot-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--margin-inset);
+  width: 1.5px;
+  background: rgba(196, 82, 72, 0.55);
+}
+
+.boot-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(22rem, calc(100vw - 2.5rem));
+  padding: 0.35rem 1rem 0.6rem;
+  text-align: center;
+}
+
+.boot-kicker,
+.boot-title,
+.boot-status,
+.boot-percent {
+  font-family: 'Caveat', cursive;
+}
+
+.boot-kicker {
+  margin: 0;
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(43, 36, 28, 0.55);
+  transform: rotate(-1.2deg);
+}
+
+.boot-title {
+  margin: 0.1rem 0 0.35rem;
+  font-size: clamp(2rem, 5vw, 2.55rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  transform: rotate(-1.8deg);
+}
+
+.boot-globe {
+  width: 5.6rem;
+  height: 5.6rem;
+  margin: 0.15rem 0 0.2rem;
+  color: var(--boot-ink);
+  transform: rotate(-4deg);
+}
+
+.boot-globe-stroke {
+  stroke-dasharray: 240;
+  stroke-dashoffset: calc(240 * (1 - var(--boot-p)));
+  transition: stroke-dashoffset 0.2s linear;
+}
+
+.boot-globe-land {
+  stroke-dasharray: 80;
+  stroke-dashoffset: calc(80 * (1 - var(--boot-p)));
+}
+
+.boot-flight {
+  position: relative;
+  width: min(16rem, 100%);
+  height: 3.4rem;
+  margin: 0.1rem 0 0.55rem;
+  color: rgba(43, 36, 28, 0.55);
+}
+
+.boot-flight-path {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.boot-plane-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.6rem;
+  height: 1.15rem;
+  color: var(--boot-ink);
+  offset-path: path('M 12 50 C 70 14, 150 14, 228 42');
+  offset-distance: calc(var(--boot-p) * 92%);
+  offset-rotate: auto;
+  transition: offset-distance 0.2s linear;
+}
+
+.boot-plane {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@supports not (offset-path: path('M 0 0 L 1 1')) {
+  .boot-plane-wrap {
+    offset-path: none;
+    top: 28%;
+    left: calc(var(--boot-p) * 82%);
+    transform: rotate(-12deg);
+  }
+}
+
+.boot-bar {
+  width: min(13.5rem, 100%);
+  height: 3px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(43, 36, 28, 0.12);
+}
+
+.boot-bar-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--boot-ink);
+  transform: scaleX(var(--boot-p));
+  transform-origin: left center;
+  transition: transform 0.2s linear;
+}
+
+.boot-status {
+  margin: 0.7rem 0 0;
+  min-height: 1.35em;
+  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  font-weight: 500;
+  color: rgba(43, 36, 28, 0.7);
+  transform: rotate(-1deg);
+}
+
+.boot-percent {
+  margin: 0.05rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(43, 36, 28, 0.38);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-screen,
+  .boot-globe-stroke,
+  .boot-globe-land,
+  .boot-plane-wrap,
+  .boot-bar-fill {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .boot-screen {
+    height: 100dvh;
+  }
+
+  .boot-page::before {
+    left: 1.35rem;
+  }
+}

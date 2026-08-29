@@ -19,6 +19,7 @@ import {
 } from '../../hooks/useScrollAcceleration.ts';
 import { accelerationMultiplier } from '../../hooks/accelerationMultiplier';
 import { planetYawDriveRef } from '../../hooks/planetYawDrive';
+import { EARTH_TEXTURES } from '../../preload/sessionAssets';
 
 /** A hair larger than Earth so clouds sit in a shell, not z-fighting the surface. */
 const CLOUD_RADIUS = EARTH_RADIUS * 1.012;
@@ -49,7 +50,7 @@ void main() {
 function CloudLayer() {
   const cloudRef = useRef<Mesh>(null);
   const { intensity } = useScrollAcceleration();
-  const cloudMap = useTexture('/textures/earth/earth-clouds.jpg') as Texture;
+  const cloudMap = useTexture(EARTH_TEXTURES.clouds) as Texture;
 
   const uniforms = useMemo(
     () => ({

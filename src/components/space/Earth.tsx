@@ -26,10 +26,11 @@ import {
   earthYawReadRef,
   planetYawDriveRef,
 } from '../../hooks/planetYawDrive';
+import { EARTH_TEXTURES } from '../../preload/sessionAssets';
 
 const EARTH_TEXTURE_URLS = [
-  '/textures/earth/earth-day.jpg',
-  '/textures/earth/earth-night.jpg',
+  EARTH_TEXTURES.day,
+  EARTH_TEXTURES.night,
 ] as const;
 
 /** JPEGs are authored in sRGB — tell Three.js so colors are not washed out. */

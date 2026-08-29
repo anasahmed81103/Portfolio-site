@@ -85,6 +85,41 @@ export function preloadSounds() {
   }
 }
 
+/**
+ * Wait until a clip is buffered enough to play through, or give up.
+ * `audio.load()` only *starts* the download — this is what actually waits.
+ */
+export function waitForSoundBuffered(
+  id: SoundId,
+  timeoutMs = 25000,
+): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  preloadSounds();
+  const audio = preloaded.get(id);
+  if (!audio) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    if (audio.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+      resolve();
+      return;
+    }
+
+    const finish = () => {
+      window.clearTimeout(timer);
+      audio.removeEventListener('canplaythrough', finish);
+      audio.removeEventListener('error', finish);
+      resolve();
+    };
+
+    const timer = window.setTimeout(finish, timeoutMs);
+    audio.addEventListener('canplaythrough', finish, { once: true });
+    audio.addEventListener('error', finish, { once: true });
+    if (audio.readyState === HTMLMediaElement.HAVE_NOTHING) {
+      audio.load();
+    }
+  });
+}
+
 /** Install click/key unlock — call once from App. */
 export function installAudioUnlock() {
   if (typeof window === 'undefined') return;
