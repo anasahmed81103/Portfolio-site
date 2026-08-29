@@ -120,9 +120,12 @@ export function waitForSoundBuffered(
   });
 }
 
+let unlockInstalled = false;
+
 /** Install click/key unlock — call once from App. */
 export function installAudioUnlock() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || unlockInstalled) return;
+  unlockInstalled = true;
   preloadSounds();
 
   const onGesture = () => {
@@ -133,8 +136,10 @@ export function installAudioUnlock() {
   };
 
   // pointerdown / keydown grant sticky activation. pointermove does not.
-  window.addEventListener('pointerdown', onGesture, { capture: true });
-  window.addEventListener('keydown', onGesture, { capture: true });
+  // once: first tap only — re-running this on every touch freezes mobile Chrome
+  // while it decodes the intro MP3 on the main thread.
+  window.addEventListener('pointerdown', onGesture, { capture: true, once: true });
+  window.addEventListener('keydown', onGesture, { capture: true, once: true });
 }
 
 function cancelFade(handle: FadeHandle | undefined) {

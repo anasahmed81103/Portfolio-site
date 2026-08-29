@@ -626,13 +626,14 @@
   background: linear-gradient(180deg, #efe6d8 0%, #e7ddd0 100%);
 }
 
-/* Narrow windows, phones, tablets, and hover-less pointers. */
 .intro-experience.intro-dock .intro-start-button {
   display: none !important;
 }
 
 .intro-experience.intro-dock .intro-mobile-start {
   display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 @media (max-width: 900px), (pointer: coarse), (hover: none), (any-pointer: coarse) {
@@ -642,6 +643,8 @@
 
   .intro-mobile-start {
     display: block;
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
