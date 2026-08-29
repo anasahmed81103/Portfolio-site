@@ -26,6 +26,12 @@
   touch-action: none;
 }
 
+@media (max-width: 900px), (pointer: coarse), (hover: none) {
+  .space-swipe-plane {
+    bottom: 5.75rem;
+  }
+}
+
 /* Crescent moon / star cursor — Space & Earth Dive */
 .space-experience.space-fine-pointer,
 .space-experience.space-fine-pointer * {
@@ -120,6 +126,7 @@
   height: 100%;
   overflow: hidden;
   background: #2a241c;
+  pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -264,13 +271,6 @@
 }
 
 @media (max-width: 900px) {
-  .space-experience,
-  .earth-dive-experience,
-  .intro-experience,
-  .notebook-experience {
-    height: 100dvh;
-  }
-
   .restart-label-full {
     display: none;
   }

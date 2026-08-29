@@ -6,6 +6,7 @@ import IntroSpaceHandoff from './intro/IntroSpaceHandoff';
 import IntroCursor from './intro/IntroCursor';
 import IntroInkTrail from './intro/IntroInkTrail';
 import { playTransition, playTransitionOnce } from '../audio/stageAudio';
+import { useIntroDock } from '../hooks/useTouchLayout';
 
 type IntroExperienceProps = {
   onSpaceHandoff?: () => void;
@@ -17,13 +18,15 @@ type IntroExperienceProps = {
  * Flow:
  * 1. Mount → play the intro-reveal sound once
  * 2. IntroScene draws the page, doodles, polaroids, signature
- * 3. Click START JOURNEY → rocket cue, then IntroSpaceHandoff (paper plane)
+ * 3. Click / tap START JOURNEY → rocket cue, then IntroSpaceHandoff (paper plane)
  * 4. Handoff calls onSpaceHandoff → App switches to Space
  *
- * IntroCursor / IntroInkTrail are DOM overlays (custom pointer + scribble).
+ * Mouse: quill cursor + ink that follows movement (no click-drag).
+ * Touch: no ink layer; a docked CTA that is not covered by a capture canvas.
  */
 function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const dock = useIntroDock();
   const [handingOff, setHandingOff] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
   const lockedRef = useRef(false);
@@ -64,7 +67,10 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   }, [onSpaceHandoff]);
 
   return (
-    <div ref={rootRef} className="intro-experience">
+    <div
+      ref={rootRef}
+      className={`intro-experience${dock ? ' intro-dock' : ''}`}
+    >
       <IntroScene
         inkTrail={<IntroInkTrail rootRef={rootRef} active={!handingOff} />}
         startButton={

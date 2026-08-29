@@ -77,7 +77,7 @@
   position: absolute;
   top: 50%;
   right: clamp(1.1rem, 2.5vw, 2rem);
-  z-index: 10;
+  z-index: 20;
   transform: translate(1.5rem, -50%);
   display: inline-flex;
   flex-direction: row;
@@ -327,8 +327,11 @@
     bottom: max(4.4rem, calc(env(safe-area-inset-bottom, 0px) + 3.5rem));
     font-size: 0.78rem;
     letter-spacing: 0.14em;
-    min-height: 2.75rem;
-    padding: 0.7rem 0.95rem 0.7rem 0.9rem;
+    min-height: 3rem;
+    min-width: min(90vw, 17rem);
+    padding: 0.75rem 1.05rem 0.75rem 1rem;
+    clip-path: none;
+    justify-content: center;
   }
 
   .space-progress-button {

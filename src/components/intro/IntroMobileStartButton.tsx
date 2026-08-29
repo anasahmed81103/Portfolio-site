@@ -8,8 +8,9 @@ type IntroMobileStartButtonProps = {
 const REVEAL_MS = 4200;
 
 /**
- * Phone / DevTools-only Start Journey control.
- * Always mounted; CSS hides it on wide screens. Never uses GSAP.
+ * Docked Start Journey control for narrow / touch layouts.
+ * Always mounted; CSS + `.intro-dock` hide it on fine-pointer desktops.
+ * Never uses GSAP, so a failed timeline cannot leave it unclickable.
  */
 function IntroMobileStartButton({
   exiting = false,
@@ -22,19 +23,17 @@ function IntroMobileStartButton({
     return () => window.clearTimeout(id);
   }, []);
 
-  const fire = (event: { preventDefault: () => void; stopPropagation: () => void }) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (exiting) return;
-    onClick();
-  };
+  const shown = visible && !exiting;
 
   return (
     <button
       type="button"
       className={`intro-mobile-start${visible ? ' is-visible' : ''}${exiting ? ' is-exiting' : ''}`}
-      onPointerUp={fire}
-      onClick={fire}
+      onPointerDown={(event) => event.stopPropagation()}
+      onClick={onClick}
+      tabIndex={shown ? 0 : -1}
+      aria-hidden={!shown}
+      disabled={exiting}
       aria-label="Start journey"
     >
       START JOURNEY

@@ -22,13 +22,16 @@ type IntroInkTrailProps = {
 };
 
 /**
- * Diary scribble layer (HTML canvas). Pointer capture keeps touch from
- * getting stuck “down” when the browser never delivers pointerup.
+ * Diary scribble layer (HTML canvas).
+ *
+ * Mouse / trackpad: ink follows pointer movement — no click-and-drag.
+ * That matches the quill cursor and is usable on laptops.
+ *
+ * Touch / pen: no ink and no pointer capture. A full-screen drawing
+ * surface would steal taps from START JOURNEY.
  */
 function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const drawingRef = useRef(false);
-  const pointerIdRef = useRef<number | null>(null);
   const lastRef = useRef<Point | null>(null);
   const segmentsRef = useRef<StrokeSegment[]>([]);
   const rafRef = useRef(0);
@@ -62,8 +65,6 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
     const canvas = canvasRef.current;
     const root = rootRef.current;
     if (!canvas || !root || !active) {
-      drawingRef.current = false;
-      pointerIdRef.current = null;
       lastRef.current = null;
       segmentsRef.current = [];
       const ctx = canvas?.getContext('2d');
@@ -88,44 +89,23 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
     const isUi = (target: EventTarget | null) =>
       target instanceof Element && Boolean(target.closest(INTERACTIVE));
 
-    const endStroke = () => {
-      const id = pointerIdRef.current;
-      if (id !== null && canvas.hasPointerCapture(id)) {
-        try {
-          canvas.releasePointerCapture(id);
-        } catch {
-          /* capture already released */
-        }
-      }
-      drawingRef.current = false;
-      pointerIdRef.current = null;
-      lastRef.current = null;
-    };
-
-    const onDown = (event: PointerEvent) => {
-      if (!event.isPrimary) return;
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
-      if (isUi(event.target)) return;
-
-      drawingRef.current = true;
-      pointerIdRef.current = event.pointerId;
-      lastRef.current = pointFromEvent(event);
-      canvas.setPointerCapture(event.pointerId);
-    };
-
     const onMove = (event: PointerEvent) => {
-      if (!drawingRef.current || event.pointerId !== pointerIdRef.current) {
+      if (!event.isPrimary) return;
+      // Touch must never ink — it would capture the gesture meant for the CTA.
+      if (event.pointerType !== 'mouse') {
+        lastRef.current = null;
         return;
       }
-      // Hover/compatibility moves after a tap must not keep inking.
-      if (event.pointerType === 'mouse' && event.buttons === 0) {
-        endStroke();
+      if (isUi(event.target)) {
+        lastRef.current = null;
         return;
       }
-      if (!lastRef.current) return;
 
       const next = pointFromEvent(event);
       const prev = lastRef.current;
+      lastRef.current = next;
+      if (!prev) return;
+
       const dx = next.x - prev.x;
       const dy = next.y - prev.y;
       if (dx * dx + dy * dy < 1.5) return;
@@ -138,14 +118,10 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
         width: 1.6 + Math.min(2.2, Math.hypot(dx, dy) * 0.08),
         born: performance.now(),
       });
-      lastRef.current = next;
     };
 
-    const onUp = (event: PointerEvent) => {
-      if (pointerIdRef.current !== null && event.pointerId !== pointerIdRef.current) {
-        return;
-      }
-      endStroke();
+    const onLeave = () => {
+      lastRef.current = null;
     };
 
     const tick = (now: number) => {
@@ -175,20 +151,14 @@ function IntroInkTrail({ rootRef, active = true }: IntroInkTrailProps) {
 
     rafRef.current = requestAnimationFrame(tick);
 
-    canvas.addEventListener('pointerdown', onDown);
-    canvas.addEventListener('pointermove', onMove);
-    canvas.addEventListener('pointerup', onUp);
-    canvas.addEventListener('pointercancel', onUp);
-    canvas.addEventListener('lostpointercapture', onUp);
+    root.addEventListener('pointermove', onMove);
+    root.addEventListener('pointerleave', onLeave);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      canvas.removeEventListener('pointerdown', onDown);
-      canvas.removeEventListener('pointermove', onMove);
-      canvas.removeEventListener('pointerup', onUp);
-      canvas.removeEventListener('pointercancel', onUp);
-      canvas.removeEventListener('lostpointercapture', onUp);
-      endStroke();
+      root.removeEventListener('pointermove', onMove);
+      root.removeEventListener('pointerleave', onLeave);
+      lastRef.current = null;
       segmentsRef.current = [];
       ctx.clearRect(0, 0, root.clientWidth, root.clientHeight);
     };

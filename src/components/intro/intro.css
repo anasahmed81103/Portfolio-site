@@ -442,7 +442,7 @@
   }
 
   .intro-note-journey {
-    bottom: 11%;
+    bottom: 18%;
     left: 50%;
     max-width: 86vw;
   }
@@ -500,7 +500,7 @@
   }
 
   .intro-note-journey {
-    bottom: 14%;
+    bottom: 20%;
   }
 
   .intro-start-button {
@@ -575,63 +575,72 @@
 
 .intro-mobile-start {
   display: none;
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
+  margin: 0;
+  min-height: 3.25rem;
+  min-width: min(90vw, 16.5rem);
+  padding: 0.9rem 1.55rem 0.75rem;
+  border: 1.8px solid rgba(43, 36, 28, 0.55);
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fffdf8 0%, #f3ebe0 100%);
+  box-shadow:
+    3px 3px 0 rgba(43, 36, 28, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  color: var(--ink, #2b241c);
+  font-family: 'Caveat', cursive;
+  font-size: clamp(1.3rem, 4.4vw, 1.65rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
   pointer-events: none;
+  transform: translateX(-50%);
 }
 
-@media (max-width: 900px) {
+.intro-mobile-start.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  animation: intro-mobile-start-in 0.65s ease forwards;
+}
+
+.intro-mobile-start.is-exiting {
+  animation: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.intro-mobile-start:active {
+  box-shadow:
+    1px 1px 0 rgba(43, 36, 28, 0.16),
+    0 2px 4px rgba(43, 36, 28, 0.08) inset;
+  background: linear-gradient(180deg, #efe6d8 0%, #e7ddd0 100%);
+}
+
+/* Narrow windows, phones, tablets, and hover-less pointers. */
+.intro-experience.intro-dock .intro-start-button {
+  display: none !important;
+}
+
+.intro-experience.intro-dock .intro-mobile-start {
+  display: block;
+}
+
+@media (max-width: 900px), (pointer: coarse), (hover: none) {
   .intro-start-button {
     display: none !important;
   }
 
   .intro-mobile-start {
     display: block;
-    position: absolute;
-    z-index: 25;
-    left: 50%;
-    bottom: max(1.15rem, calc(env(safe-area-inset-bottom, 0px) + 0.85rem));
-    margin: 0;
-    min-height: 3.1rem;
-    min-width: 12rem;
-    padding: 0.8rem 1.4rem 0.65rem;
-    border: 1.8px solid rgba(43, 36, 28, 0.55);
-    border-radius: 2px;
-    background: linear-gradient(180deg, #fffdf8 0%, #f3ebe0 100%);
-    box-shadow:
-      3px 3px 0 rgba(43, 36, 28, 0.12),
-      0 1px 0 rgba(255, 255, 255, 0.7) inset;
-    color: var(--ink, #2b241c);
-    font-family: 'Caveat', cursive;
-    font-size: clamp(1.25rem, 4.2vw, 1.55rem);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-    touch-action: manipulation;
-    opacity: 0;
-    pointer-events: auto;
-    transform: translateX(-50%);
-    animation: intro-mobile-start-in 0.65s ease 4.2s forwards;
-  }
-
-  .intro-mobile-start.is-visible {
-    opacity: 1;
-    animation: none;
-    transform: translateX(-50%);
-  }
-
-  .intro-mobile-start.is-exiting {
-    animation: none;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.18s ease;
-  }
-
-  .intro-mobile-start:active {
-    box-shadow:
-      1px 1px 0 rgba(43, 36, 28, 0.16),
-      0 2px 4px rgba(43, 36, 28, 0.08) inset;
-    background: linear-gradient(180deg, #efe6d8 0%, #e7ddd0 100%);
   }
 }
 
@@ -750,13 +759,12 @@
   display: block;
 }
 
-/* Ephemeral ink scribbles — sits above the page, below buttons / handoff */
+/* Ephemeral ink scribbles — paint only, never a hit target */
 .intro-ink-trail {
   position: absolute;
   inset: 0;
   z-index: 4;
   width: 100%;
   height: 100%;
-  pointer-events: auto;
-  touch-action: none;
+  pointer-events: none;
 }

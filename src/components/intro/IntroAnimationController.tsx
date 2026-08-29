@@ -331,12 +331,15 @@ function IntroAnimationController({ children }: IntroAnimationControllerProps) {
       });
     }, root);
     } catch {
-      const button = (
-        root.closest('.intro-experience') ?? root
-      ).querySelector<HTMLElement>('.intro-start-button');
-      if (button) {
-        button.style.opacity = '1';
-        button.style.pointerEvents = 'auto';
+      const scope = root.closest('.intro-experience') ?? root;
+      const desktop = scope.querySelector<HTMLElement>('.intro-start-button');
+      const mobile = scope.querySelector<HTMLElement>('.intro-mobile-start');
+      if (desktop) {
+        desktop.style.opacity = '1';
+        desktop.style.pointerEvents = 'auto';
+      }
+      if (mobile) {
+        mobile.classList.add('is-visible');
       }
     }
 
