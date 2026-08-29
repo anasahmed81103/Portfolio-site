@@ -8,7 +8,6 @@ import IntroSignature from './IntroSignature';
 import './intro.css';
 
 type IntroSceneProps = {
-  startButton?: ReactNode;
   inkTrail?: ReactNode;
 };
 
@@ -16,8 +15,12 @@ type IntroSceneProps = {
  * Assembles the intro page pieces. IntroAnimationController wraps them so
  * one GSAP timeline can find `.intro-doodle`, `.intro-polaroid`, etc. via
  * CSS class names (see intro.css).
+ *
+ * Start buttons stay outside this tree — `.intro-scene` is
+ * `pointer-events: none`, and some mobile engines ignore
+ * `pointer-events: auto` on descendants of that.
  */
-function IntroScene({ startButton, inkTrail }: IntroSceneProps) {
+function IntroScene({ inkTrail }: IntroSceneProps) {
   return (
     <IntroAnimationController>
       <IntroPage />
@@ -26,7 +29,6 @@ function IntroScene({ startButton, inkTrail }: IntroSceneProps) {
       <IntroPolaroids />
       <IntroSignature />
       {inkTrail}
-      {startButton}
     </IntroAnimationController>
   );
 }

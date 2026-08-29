@@ -57,7 +57,9 @@ function IntroAnimationController({ children }: IntroAnimationControllerProps) {
         '.intro-signature-underline, .intro-signature-flourish',
         root,
       );
-      const startButton = root.querySelector<HTMLElement>('.intro-start-button');
+      const startButton = (
+        root.closest('.intro-experience') ?? root
+      ).querySelector<HTMLElement>('.intro-start-button');
 
       const idleDoodles = doodles.filter((el) => el !== plane);
       const entranceDoodles = idleDoodles;

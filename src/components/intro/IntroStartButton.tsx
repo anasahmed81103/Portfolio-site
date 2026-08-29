@@ -11,7 +11,10 @@ function IntroStartButton({ disabled, pressed, onClick }: IntroStartButtonProps)
       type="button"
       className={`intro-start-button${pressed ? ' is-pressed' : ''}`}
       disabled={disabled}
-      onPointerDown={(event) => event.stopPropagation()}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
       onClick={onClick}
       aria-label="Start journey"
     >

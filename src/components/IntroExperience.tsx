@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import IntroScene from './intro/IntroScene';
 import IntroStartButton from './intro/IntroStartButton';
 import IntroMobileStartButton from './intro/IntroMobileStartButton';
@@ -12,6 +12,8 @@ type IntroExperienceProps = {
   onSpaceHandoff?: () => void;
 };
 
+const TOUCH_START_GRACE_MS = 400;
+
 /**
  * First chapter: hand-drawn sketchbook (pure HTML/SVG + GSAP, no WebGL).
  *
@@ -22,7 +24,8 @@ type IntroExperienceProps = {
  * 4. Handoff calls onSpaceHandoff → App switches to Space
  *
  * Mouse: quill cursor + ink that follows movement (no click-drag).
- * Touch: no ink layer; a docked CTA that is not covered by a capture canvas.
+ * Touch: tap anywhere (or the docked CTA). The page itself is otherwise
+ * inert, so a missed button tap used to feel like a frozen screen.
  */
 function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -62,6 +65,38 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
     }, 120);
   }, []);
 
+  // Real phones often never fire `click`. The scene is pointer-events: none,
+  // so a tap that misses the CTA used to do nothing. After a short grace
+  // (so a tap-to-focus does not skip the page), any touch starts the journey.
+  useEffect(() => {
+    if (!dock) return;
+    const root = rootRef.current;
+    if (!root) return;
+
+    let armed = false;
+    const arm = window.setTimeout(() => {
+      armed = true;
+      root.classList.add('intro-ready');
+    }, TOUCH_START_GRACE_MS);
+
+    const start = (event: Event) => {
+      if (!armed || lockedRef.current) return;
+      if (event.type === 'touchend') {
+        event.preventDefault();
+      }
+      handleStart();
+    };
+
+    root.addEventListener('touchend', start, { passive: false });
+    root.addEventListener('pointerup', start);
+    return () => {
+      window.clearTimeout(arm);
+      root.classList.remove('intro-ready');
+      root.removeEventListener('touchend', start);
+      root.removeEventListener('pointerup', start);
+    };
+  }, [dock, handleStart]);
+
   const handleHandoffComplete = useCallback(() => {
     onSpaceHandoff?.();
   }, [onSpaceHandoff]);
@@ -73,13 +108,11 @@ function IntroExperience({ onSpaceHandoff }: IntroExperienceProps) {
     >
       <IntroScene
         inkTrail={<IntroInkTrail rootRef={rootRef} active={!handingOff} />}
-        startButton={
-          <IntroStartButton
-            onClick={handleStart}
-            disabled={handingOff || buttonPressed}
-            pressed={buttonPressed}
-          />
-        }
+      />
+      <IntroStartButton
+        onClick={handleStart}
+        disabled={handingOff || buttonPressed}
+        pressed={buttonPressed}
       />
       <IntroMobileStartButton
         onClick={handleStart}

@@ -118,15 +118,21 @@
   height: 100%;
 }
 
-/* Full-viewport container for the Intro notebook scene */
+/* Full-viewport container for the Intro notebook scene.
+   100svh = visible height while Chrome’s URL bar is showing.
+   inset:0 + 100dvh was taller than the screen and hid the CTA. */
 .intro-experience {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  height: 100svh;
+  max-height: 100%;
   overflow: hidden;
   background: #2a241c;
   pointer-events: auto;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 

@@ -15,12 +15,12 @@ html,
 body {
   overflow: hidden;
   overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 body {
   font-family: system-ui, sans-serif;
   background: #f4efe6;
-  touch-action: manipulation;
 }
 
 button,
